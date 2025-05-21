@@ -1,294 +1,168 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player</title>
-<script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: #000;
-    overflow: hidden;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player com Gestos</title>
+  <script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+    }
 
-  #player {
-    width: 100%;
-    height: 100%;
-    min-height: 360px;
-    position: relative;
-  }
+    #player-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
 
-  #continue-box {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    display: none;
-    justify-content: center;
-    align-items: center;
-  }
+    #my-player {
+      width: 100%;
+      height: 100%;
+    }
 
-  #continue-box.active {
-    display: flex;
-    pointer-events: auto;
-  }
+    #gesture-left, #gesture-right {
+      position: absolute;
+      top: 0;
+      width: 20%;
+      height: 100%;
+      touch-action: none;
+      pointer-events: auto;
+      z-index: 9998;
+    }
 
-  ._4continuar {
-    color: #fff;
-    padding: 20px;
-    max-width: 90%;
-    text-align: center;
-    border-radius: 8px;
-    background: rgba(41, 41, 41, 0.95);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  }
+    #gesture-left {
+      left: 0;
+      background: rgba(255, 0, 0, 0.05); /* DEBUG: pode remover depois */
+    }
 
-  ._4continuar .bt {
-    padding: 10px 20px;
-    background: #383838;
-    display: inline-block;
-    margin: 10px 5px 0;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-  }
+    #gesture-right {
+      right: 0;
+      background: rgba(0, 0, 255, 0.05); /* DEBUG: pode remover depois */
+    }
 
-  ._4continuar .bt:hover {
-    background: #504f4f;
-  }
+    #brightness-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9997;
+    }
 
-  #gesture-left, #gesture-right {
-    position: absolute;
-    top: 0;
-    width: 20%;
-    height: 100%;
-    z-index: 9998;
-    touch-action: none;
-    display: block;
-  }
+    #hud-feedback {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(30, 30, 30, 0.9);
+      padding: 12px 20px;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      z-index: 99999;
+    }
 
-  #gesture-left { left: 0; }
-  #gesture-right { right: 0; }
-
-  #brightness-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: black;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 9997;
-  }
-
-  #hud-feedback {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(30, 30, 30, 0.85);
-    padding: 12px 20px;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    z-index: 99999;
-  }
-
-  #hud-feedback img {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 5px;
-  }
-</style>
+    #hud-feedback img {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 5px;
+    }
+  </style>
 </head>
 <body>
 
-<div id="continue-box"></div>
-<div id="player">Carregando o player...</div>
-<div id="brightness-overlay"></div>
-<div id="gesture-left"></div>
-<div id="gesture-right"></div>
+<div id="player-container">
+  <div id="my-player">Carregando player...</div>
 
-<!-- HUD visual -->
-<div id="hud-feedback">
-  <img id="hud-icon" src="" alt="icone">
-  <div id="hud-text"></div>
+  <div id="brightness-overlay"></div>
+  <div id="gesture-left"></div>
+  <div id="gesture-right"></div>
+
+  <div id="hud-feedback">
+    <img id="hud-icon" src="" alt="icone">
+    <div id="hud-text"></div>
+  </div>
 </div>
 
 <script>
   jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
 
-  function getQueryParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
+  const videoURL = "https://cdn.jwplayer.com/manifests/yp34SRmf.m3u8"; // vídeo de teste JWPlayer
+  let volume = 100;
+  let brightness = 0;
+  let startY = 0;
+  let isLeft = false;
+  let hudTimeout;
+
+  function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
   }
 
-  const VIDEO_URL = getQueryParam("video");
-  const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
+  function showHUD(type, value) {
+    const hud = document.getElementById('hud-feedback');
+    const icon = document.getElementById('hud-icon');
+    const text = document.getElementById('hud-text');
 
-  if (!VIDEO_URL) {
-    document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
-  } else {
-    const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
-    const ID = 'video_' + videoName;
-    let currentPosition = parseFloat(localStorage.getItem(ID));
-    let volume = 100;
-    let brightness = 0;
-    let startY = 0;
-    let isLeft = false;
-    let hudTimeout;
-
-    function clamp(val, min, max) {
-      return Math.max(min, Math.min(max, val));
+    if (type === 'volume') {
+      icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
+      text.textContent = `Volume: ${Math.round(value)}%`;
+    } else {
+      icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
+      text.textContent = `Brilho: ${Math.round(value * 100)}%`;
     }
 
-    function millisToMinutesAndSeconds(time) {
-      const min = Math.floor(time / 60);
-      const sec = ("0" + Math.floor(time % 60)).slice(-2);
-      return `${min}:${sec}`;
-    }
-
-    function showHUD(type, value) {
-      const hud = document.getElementById('hud-feedback');
-      const icon = document.getElementById('hud-icon');
-      const text = document.getElementById('hud-text');
-
-      if (type === 'volume') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
-        text.textContent = `Volume: ${Math.round(value)}%`;
-      } else if (type === 'brilho') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
-        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
-      }
-
-      hud.style.display = 'flex';
-      clearTimeout(hudTimeout);
-      hudTimeout = setTimeout(() => {
-        hud.style.display = 'none';
-      }, 1500);
-    }
-
-    function handleStart(e, side) {
-      startY = e.touches[0].clientY;
-      isLeft = (side === 'left');
-    }
-
-    function handleMove(e) {
-      const deltaY = startY - e.touches[0].clientY;
-      const change = deltaY / window.innerHeight * 100;
-
-      if (!isLeft) {
-        volume = clamp(volume + change, 0, 100);
-        jwplayer().setVolume(volume);
-        showHUD('volume', volume);
-      } else {
-        brightness = clamp(brightness - (change / 150), 0, 0.8);
-        document.getElementById('brightness-overlay').style.opacity = brightness;
-        showHUD('brilho', brightness);
-      }
-
-      startY = e.touches[0].clientY;
-    }
-
-    jwplayer("player").setup({
-      file: VIDEO_URL,
-      width: "100%",
-      height: "100%",
-      controls: true,
-      autostart: false,
-      playbackRateControls: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],
-      displaytitle: true,
-      preload: "none",
-      repeat: false,
-      volume: volume,
-      localization: {
-        rewind: "Voltar 10s",
-        forward: "Avançar 10s",
-        fullscreen: "Tela Cheia",
-        hd: "Qualidade"
-      }
-    });
-
-    jwplayer("player").on('ready', function () {
-      jwplayer("player").setPlaybackRate(1);
-
-      setTimeout(() => {
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
-          "Pular OP/ED",
-          () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
-          "skip"
-        );
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
-          "Avançar 10s",
-          () => jwplayer("player").seek(jwplayer("player").getPosition() + 10),
-          "forward"
-        );
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
-          "Voltar 10s",
-          () => {
-            const time = jwplayer("player").getPosition() - 10;
-            jwplayer("player").seek(time > 0 ? time : 0);
-          },
-          "rewind"
-        );
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/499849/download.svg",
-          "Baixar",
-          () => window.open(DOWNLOAD_URL, "_blank"),
-          "download"
-        );
-      }, 500);
-    });
-
-    jwplayer("player").on('firstFrame', function () {
-      if (currentPosition && currentPosition > 0) {
-        jwplayer("player").pause();
-        const box = `
-          <div class="_4continuar">
-            <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
-            <button class="bt" data-time="${currentPosition}">Sim</button>
-            <button class="bt" data-time="0">Não</button>
-          </div>`;
-        $("#continue-box").html(box).addClass("active");
-      }
-    });
-
-    $(document).on('click', '._4continuar .bt', function () {
-      const time = parseFloat($(this).data("time"));
-      $("#continue-box").removeClass("active").empty();
-      jwplayer("player").seek(time);
-      jwplayer("player").play();
-    });
-
-    jwplayer("player").on('time', function () {
-      const pos = jwplayer("player").getPosition();
-      if (!isNaN(pos)) {
-        localStorage.setItem(ID, pos);
-      }
-    });
-
-    window.addEventListener("message", function (e) {
-      if (e.data === 'autoplay') {
-        jwplayer("player").play();
-      }
-    });
-
-    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
-    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
-    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
-    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
+    hud.style.display = 'flex';
+    clearTimeout(hudTimeout);
+    hudTimeout = setTimeout(() => {
+      hud.style.display = 'none';
+    }, 1500);
   }
+
+  function handleStart(e, side) {
+    startY = e.touches[0].clientY;
+    isLeft = (side === 'left');
+  }
+
+  function handleMove(e) {
+    const deltaY = startY - e.touches[0].clientY;
+    const change = deltaY / window.innerHeight * 100;
+
+    if (!isLeft) {
+      volume = clamp(volume + change, 0, 100);
+      jwplayer().setVolume(volume);
+      showHUD('volume', volume);
+    } else {
+      brightness = clamp(brightness - (change / 150), 0, 0.8);
+      document.getElementById('brightness-overlay').style.opacity = brightness;
+      showHUD('brilho', brightness);
+    }
+
+    startY = e.touches[0].clientY;
+  }
+
+  document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
+  document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
+  document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
+  document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
+
+  // JWPlayer setup
+  jwplayer("my-player").setup({
+    file: videoURL,
+    width: "100%",
+    height: "100%",
+    autostart: true,
+    controls: true
+  });
 </script>
+
 </body>
 </html>
