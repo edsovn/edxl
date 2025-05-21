@@ -70,7 +70,7 @@
     height: 100%;
     z-index: 9998;
     touch-action: none;
-    display: none;
+    display: block;
   }
 
   #gesture-left { left: 0; }
@@ -142,7 +142,6 @@
     let currentPosition = parseFloat(localStorage.getItem(ID));
     let volume = 100;
     let brightness = 0;
-    let isFullscreen = false;
     let startY = 0;
     let isLeft = false;
     let hudTimeout;
@@ -158,8 +157,6 @@
     }
 
     function showHUD(type, value) {
-      if (!isFullscreen) return;
-
       const hud = document.getElementById('hud-feedback');
       const icon = document.getElementById('hud-icon');
       const text = document.getElementById('hud-text');
@@ -180,13 +177,11 @@
     }
 
     function handleStart(e, side) {
-      if (!isFullscreen) return;
       startY = e.touches[0].clientY;
       isLeft = (side === 'left');
     }
 
     function handleMove(e) {
-      if (!isFullscreen) return;
       const deltaY = startY - e.touches[0].clientY;
       const change = deltaY / window.innerHeight * 100;
 
@@ -261,7 +256,7 @@
         jwplayer("player").pause();
         const box = `
           <div class="_4continuar">
-            <p>Aparentemente você ja esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
+            <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
@@ -293,15 +288,6 @@
     document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
     document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
     document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
-
-    jwplayer("player").on('fullscreen', function (e) {
-      isFullscreen = e.fullscreen;
-      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
-      if (!isFullscreen) {
-        document.getElementById('hud-feedback').style.display = 'none';
-      }
-    });
   }
 </script>
 </body>
