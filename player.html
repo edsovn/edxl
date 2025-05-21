@@ -21,7 +21,7 @@
     .jw-reset .jw-button-container div.jw-icon-rewind {
       display: none;
     }
-  
+	
   ._4continuar {
     color: #fff;
     min-height: 6em;
@@ -120,12 +120,13 @@
     );
 
     (function () {
-      const ID = 'videoUrl';
+      const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
+      const ID = 'video_' + videoName;
       let lock = false;
-      let currentPosition = localStorage.getItem("w" + ID);
+      let currentPosition = parseFloat(localStorage.getItem(ID));
 
       jwplayer("player").on('play', function () {
-        if (!lock && currentPosition > 0) {
+        if (!lock && currentPosition && currentPosition > 0) {
           jwplayer("player").pause();
           const box = `
             <div class="_4continuar">
@@ -139,13 +140,16 @@
       });
 
       $(document).on('click', '._4continuar .bt', function () {
-        const time = $(this).data("time");
+        const time = parseFloat($(this).data("time"));
         $("._4continuar").remove();
         jwplayer("player").seek(time);
       });
 
       jwplayer("player").on('time', function () {
-        localStorage.setItem("w" + ID, jwplayer("player").getPosition());
+        const pos = jwplayer("player").getPosition();
+        if (!isNaN(pos)) {
+          localStorage.setItem(ID, pos);
+        }
       });
 
       function millisToMinutesAndSeconds(time) {
