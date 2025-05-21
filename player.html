@@ -155,7 +155,7 @@ jwplayer("player").on('firstFrame', function () {
       jwplayer("player").on('ready', function () {
       setTimeout(() => {
         jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/189/189792.png",
+          "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
           "Pular OP/ED",
           function () {
             jwplayer("player").seek(jwplayer("player").getPosition() + 82);
@@ -164,7 +164,7 @@ jwplayer("player").on('firstFrame', function () {
         );
 
         jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/271/271228.png",
+          "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
           "Avançar 10s",
           function () {
             const time = jwplayer("player").getPosition() + 10;
@@ -174,7 +174,7 @@ jwplayer("player").on('firstFrame', function () {
         );
 
         jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/271/271220.png",
+          "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
           "Voltar 10s",
           function () {
             const time = jwplayer("player").getPosition() - 10;
@@ -184,7 +184,7 @@ jwplayer("player").on('firstFrame', function () {
         );
 
         jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/709/709586.png",
+          "https://www.svgrepo.com/download/499849/download.svg",
           "Baixar",
           function () {
             window.open(DOWNLOAD_URL, "_blank");
