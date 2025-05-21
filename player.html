@@ -18,38 +18,44 @@
     min-height: 360px;
   }
 
-    .jw-reset .jw-button-container div.jw-icon-rewind {
-      display: none;
-    }
+  .jw-reset .jw-button-container div.jw-icon-rewind {
+    display: none;
+  }
 
-  
-#continue-box {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  z-index: 9999;
-  pointer-events: auto;
-}
+  #continue-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+  }
 
   ._4continuar {
     color: #fff;
-    min-height: 6em;
-    padding: 18px;
-    margin: 10px;
-    width: calc(100% - 20px);
-    text-align: left;
-    border-radius: 4px;
-    background: #292929;
+    padding: 20px;
+    max-width: 90%;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(41, 41, 41, 0.95);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
+
   ._4continuar .bt {
-    padding: 10px;
+    padding: 10px 20px;
     background: #383838;
     display: inline-block;
-    margin: 5px;
+    margin: 10px 5px 0;
     border-radius: 4px;
     cursor: pointer;
+    color: white;
+    font-weight: bold;
   }
+
   ._4continuar .bt:hover {
     background: #504f4f;
   }
@@ -97,50 +103,47 @@
       }
     });
 
-    
-jwplayer("player").on('ready', function () {
-  jwplayer("player").setPlaybackRate(1);
+    jwplayer("player").on('ready', function () {
+      jwplayer("player").setPlaybackRate(1);
 
-  setTimeout(() => {
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/727/727245.png",
-      "Pular OP/ED",
-      function () {
-        jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-      },
-      "skip"
-    );
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/545/545682.png",
-      "Avançar 10s",
-      function () {
-        const time = jwplayer("player").getPosition() + 10;
-        jwplayer("player").seek(time);
-      },
-      "forward"
-    );
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/545/545680.png",
-      "Voltar 10s",
-      function () {
-        const time = jwplayer("player").getPosition() - 10;
-        jwplayer("player").seek(time > 0 ? time : 0);
-      },
-      "rewind"
-    );
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/709/709699.png",
-      "Baixar",
-      function () {
-        window.open(DOWNLOAD_URL, "_blank");
-      },
-      "download"
-    );
-  }, 500);
-});
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/727/727245.png",
+          "Pular OP/ED",
+          function () {
+            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+          },
+          "skip"
+        );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/545/545682.png",
+          "Avançar 10s",
+          function () {
+            jwplayer("player").seek(jwplayer("player").getPosition() + 10);
+          },
+          "forward"
+        );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/545/545680.png",
+          "Voltar 10s",
+          function () {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/709/709699.png",
+          "Baixar",
+          function () {
+            window.open(DOWNLOAD_URL, "_blank");
+          },
+          "download"
+        );
+      }, 500);
+    });
 
-
-jwplayer("player").on('firstFrame', function () {
+    jwplayer("player").on('firstFrame', function () {
       if (currentPosition && currentPosition > 0) {
         jwplayer("player").pause();
         const box = `
@@ -153,46 +156,42 @@ jwplayer("player").on('firstFrame', function () {
       }
 
       jwplayer("player").on('ready', function () {
-      setTimeout(() => {
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
-          "Pular OP/ED",
-          function () {
-            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-          },
-          "skip"
-        );
-
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
-          "Avançar 10s",
-          function () {
-            const time = jwplayer("player").getPosition() + 10;
-            jwplayer("player").seek(time);
-          },
-          "forward"
-        );
-
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
-          "Voltar 10s",
-          function () {
-            const time = jwplayer("player").getPosition() - 10;
-            jwplayer("player").seek(time > 0 ? time : 0);
-          },
-          "rewind"
-        );
-
-        jwplayer("player").addButton(
-          "https://www.svgrepo.com/download/499849/download.svg",
-          "Baixar",
-          function () {
-            window.open(DOWNLOAD_URL, "_blank");
-          },
-          "download"
-        );
-            }, 500);
-    });
+        setTimeout(() => {
+          jwplayer("player").addButton(
+            "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
+            "Pular OP/ED",
+            function () {
+              jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+            },
+            "skip"
+          );
+          jwplayer("player").addButton(
+            "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
+            "Avançar 10s",
+            function () {
+              jwplayer("player").seek(jwplayer("player").getPosition() + 10);
+            },
+            "forward"
+          );
+          jwplayer("player").addButton(
+            "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
+            "Voltar 10s",
+            function () {
+              const time = jwplayer("player").getPosition() - 10;
+              jwplayer("player").seek(time > 0 ? time : 0);
+            },
+            "rewind"
+          );
+          jwplayer("player").addButton(
+            "https://www.svgrepo.com/download/499849/download.svg",
+            "Baixar",
+            function () {
+              window.open(DOWNLOAD_URL, "_blank");
+            },
+            "download"
+          );
+        }, 500);
+      });
     });
 
     $(document).on('click', '._4continuar .bt', function () {
