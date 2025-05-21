@@ -21,7 +21,7 @@
     .jw-reset .jw-button-container div.jw-icon-rewind {
       display: none;
     }
-	
+
   ._4continuar {
     color: #fff;
     min-height: 6em;
@@ -122,12 +122,12 @@
     (function () {
       const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
       const ID = 'video_' + videoName;
-      let lock = false;
-      let currentPosition = parseFloat(localStorage.getItem(ID));
 
-      jwplayer("player").on('play', function () {
-        if (!lock && currentPosition && currentPosition > 0) {
-          jwplayer("player").pause();
+      let currentPosition = parseFloat(localStorage.getItem(ID));
+      console.log("Progresso salvo encontrado:", currentPosition);
+
+      jwplayer("player").on('ready', function () {
+        if (currentPosition && currentPosition > 0) {
           const box = `
             <div class="_4continuar">
               <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
@@ -136,19 +136,20 @@
             </div>`;
           $("#player").append(box);
         }
-        lock = true;
       });
 
       $(document).on('click', '._4continuar .bt', function () {
         const time = parseFloat($(this).data("time"));
         $("._4continuar").remove();
         jwplayer("player").seek(time);
+        jwplayer("player").play();
       });
 
       jwplayer("player").on('time', function () {
         const pos = jwplayer("player").getPosition();
         if (!isNaN(pos)) {
           localStorage.setItem(ID, pos);
+          console.log("Salvando progresso:", pos);
         }
       });
 
