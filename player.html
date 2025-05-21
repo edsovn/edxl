@@ -32,27 +32,36 @@
   pointer-events: auto;
 }
 
-  ._4continuar {
-    color: #fff;
-    min-height: 6em;
-    padding: 18px;
-    margin: 10px;
-    width: calc(100% - 20px);
-    text-align: left;
-    border-radius: 4px;
-    background: #292929;
-  }
-  ._4continuar .bt {
-    padding: 10px;
-    background: #383838;
-    display: inline-block;
-    margin: 5px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  ._4continuar .bt:hover {
-    background: #504f4f;
-  }
+  
+._4continuar {
+  color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 500px;
+  text-align: center;
+  border-radius: 8px;
+  background: #1c1c1c;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+  
+._4continuar .bt {
+  padding: 12px 20px;
+  background: #333;
+  color: #fff;
+  display: inline-block;
+  margin: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+}
+
+  
+._4continuar .bt:hover {
+  background: #555;
+}
+
 </style>
 <script>
   jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
@@ -97,58 +106,7 @@
       }
     });
 
-    jwplayer("player").on('firstFrame', function () {
-      if (currentPosition && currentPosition > 0) {
-        const box = `
-          <div class="_4continuar">
-            <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
-            <button class="bt" data-time="${currentPosition}">Sim</button>
-            <button class="bt" data-time="0">Não</button>
-          </div>`;
-        $("#continue-box").html(box);
-      }
-
-      jwplayer("player").on('ready', function () {
-      setTimeout(() => {
-        jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/189/189792.png",
-          "Pular OP/ED",
-          function () {
-            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-          },
-          "skip"
-        );
-
-        jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/271/271228.png",
-          "Avançar 10s",
-          function () {
-            const time = jwplayer("player").getPosition() + 10;
-            jwplayer("player").seek(time);
-          },
-          "forward"
-        );
-
-        jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/271/271220.png",
-          "Voltar 10s",
-          function () {
-            const time = jwplayer("player").getPosition() - 10;
-            jwplayer("player").seek(time > 0 ? time : 0);
-          },
-          "rewind"
-        );
-
-        jwplayer("player").addButton(
-          "https://cdn-icons-png.flaticon.com/512/709/709586.png",
-          "Baixar",
-          function () {
-            window.open(DOWNLOAD_URL, "_blank");
-          },
-          "download"
-        );
-            }, 500);
-    });
+    
     });
 
     $(document).on('click', '._4continuar .bt', function () {
