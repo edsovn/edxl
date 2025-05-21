@@ -29,9 +29,13 @@
     width: 100%;
     height: 100%;
     z-index: 9999;
-    display: flex;
+    display: none; /* Oculto por padrão */
     justify-content: center;
     align-items: center;
+  }
+
+  #continue-box.active {
+    display: flex;
     pointer-events: auto;
   }
 
@@ -152,7 +156,7 @@
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
-        $("#continue-box").html(box);
+        $("#continue-box").html(box).addClass("active");
       }
 
       jwplayer("player").on('ready', function () {
@@ -196,7 +200,7 @@
 
     $(document).on('click', '._4continuar .bt', function () {
       const time = parseFloat($(this).data("time"));
-      $("._4continuar").remove();
+      $("#continue-box").removeClass("active").empty();
       jwplayer("player").seek(time);
       jwplayer("player").play();
     });
