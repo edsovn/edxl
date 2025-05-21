@@ -142,6 +142,7 @@ jwplayer("player").on('ready', function () {
 
 jwplayer("player").on('firstFrame', function () {
       if (currentPosition && currentPosition > 0) {
+        jwplayer("player").pause();
         const box = `
           <div class="_4continuar">
             <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
