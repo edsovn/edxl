@@ -110,6 +110,7 @@
 </style>
 </head>
 <body>
+
 <div id="continue-box"></div>
 <div id="player">Carregando o player...</div>
 <div id="brightness-overlay"></div>
@@ -141,9 +142,65 @@
     let currentPosition = parseFloat(localStorage.getItem(ID));
     let volume = 100;
     let brightness = 0;
+    let isFullscreen = false;
+    let startY = 0;
+    let isLeft = false;
+    let hudTimeout;
 
     function clamp(val, min, max) {
       return Math.max(min, Math.min(max, val));
+    }
+
+    function millisToMinutesAndSeconds(time) {
+      const min = Math.floor(time / 60);
+      const sec = ("0" + Math.floor(time % 60)).slice(-2);
+      return `${min}:${sec}`;
+    }
+
+    function showHUD(type, value) {
+      if (!isFullscreen) return;
+
+      const hud = document.getElementById('hud-feedback');
+      const icon = document.getElementById('hud-icon');
+      const text = document.getElementById('hud-text');
+
+      if (type === 'volume') {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
+        text.textContent = `Volume: ${Math.round(value)}%`;
+      } else if (type === 'brilho') {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
+        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
+      }
+
+      hud.style.display = 'flex';
+      clearTimeout(hudTimeout);
+      hudTimeout = setTimeout(() => {
+        hud.style.display = 'none';
+      }, 1500);
+    }
+
+    function handleStart(e, side) {
+      if (!isFullscreen) return;
+      startY = e.touches[0].clientY;
+      isLeft = (side === 'left');
+    }
+
+    function handleMove(e) {
+      if (!isFullscreen) return;
+      const deltaY = startY - e.touches[0].clientY;
+      const change = deltaY / window.innerHeight * 100;
+
+      if (!isLeft) {
+        volume = clamp(volume + change, 0, 100);
+        jwplayer().setVolume(volume);
+        showHUD('volume', volume);
+      } else {
+        brightness = clamp(brightness - (change / 150), 0, 0.8);
+        document.getElementById('brightness-overlay').style.opacity = brightness;
+        showHUD('brilho', brightness);
+      }
+
+      startY = e.touches[0].clientY;
     }
 
     jwplayer("player").setup({
@@ -172,23 +229,19 @@
         jwplayer("player").addButton(
           "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
           "Pular OP/ED",
-          function () {
-            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-          },
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
           "skip"
         );
         jwplayer("player").addButton(
           "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
           "Avançar 10s",
-          function () {
-            jwplayer("player").seek(jwplayer("player").getPosition() + 10);
-          },
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 10),
           "forward"
         );
         jwplayer("player").addButton(
           "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
           "Voltar 10s",
-          function () {
+          () => {
             const time = jwplayer("player").getPosition() - 10;
             jwplayer("player").seek(time > 0 ? time : 0);
           },
@@ -197,9 +250,7 @@
         jwplayer("player").addButton(
           "https://www.svgrepo.com/download/499849/download.svg",
           "Baixar",
-          function () {
-            window.open(DOWNLOAD_URL, "_blank");
-          },
+          () => window.open(DOWNLOAD_URL, "_blank"),
           "download"
         );
       }, 500);
@@ -232,64 +283,11 @@
       }
     });
 
-    function millisToMinutesAndSeconds(time) {
-      const min = Math.floor(time / 60);
-      const sec = ("0" + Math.floor(time % 60)).slice(-2);
-      return `${min}:${sec}`;
-    }
-
     window.addEventListener("message", function (e) {
       if (e.data === 'autoplay') {
         jwplayer("player").play();
       }
     });
-
-    // --- GESTO COM HUD ---
-    let startY = 0;
-    let isLeft = false;
-    let hudTimeout;
-
-    function showHUD(type, value) {
-      const hud = document.getElementById('hud-feedback');
-      const icon = document.getElementById('hud-icon');
-      const text = document.getElementById('hud-text');
-
-      if (type === 'volume') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
-        text.textContent = `Volume: ${Math.round(value)}%`;
-      } else if (type === 'brilho') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
-        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
-      }
-
-      hud.style.display = 'flex';
-      clearTimeout(hudTimeout);
-      hudTimeout = setTimeout(() => {
-        hud.style.display = 'none';
-      }, 1500);
-    }
-
-    function handleStart(e, side) {
-      startY = e.touches[0].clientY;
-      isLeft = (side === 'left');
-    }
-
-    function handleMove(e) {
-      const deltaY = startY - e.touches[0].clientY;
-      const change = deltaY / window.innerHeight * 100;
-
-      if (!isLeft) {
-        volume = clamp(volume + change, 0, 100);
-        jwplayer().setVolume(volume);
-        showHUD('volume', volume);
-      } else {
-        brightness = clamp(brightness - (change / 150), 0, 0.8);
-        document.getElementById('brightness-overlay').style.opacity = brightness;
-        showHUD('brilho', brightness);
-      }
-
-      startY = e.touches[0].clientY;
-    }
 
     document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
     document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
@@ -297,9 +295,12 @@
     document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
 
     jwplayer("player").on('fullscreen', function (e) {
-      const show = e.fullscreen;
-      document.getElementById('gesture-left').style.display = show ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = show ? 'block' : 'none';
+      isFullscreen = e.fullscreen;
+      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
+      if (!isFullscreen) {
+        document.getElementById('hud-feedback').style.display = 'none';
+      }
     });
   }
 </script>
