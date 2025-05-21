@@ -107,6 +107,100 @@
     });
 
     
+jwplayer("player").on('ready', function () {
+  jwplayer("player").setPlaybackRate(1);
+
+  setTimeout(() => {
+    jwplayer("player").addButton(
+      "https://cdn-icons-png.flaticon.com/512/189/189792.png",
+      "Pular OP/ED",
+      function () {
+        jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+      },
+      "skip"
+    );
+    jwplayer("player").addButton(
+      "https://cdn-icons-png.flaticon.com/512/271/271228.png",
+      "Avançar 10s",
+      function () {
+        const time = jwplayer("player").getPosition() + 10;
+        jwplayer("player").seek(time);
+      },
+      "forward"
+    );
+    jwplayer("player").addButton(
+      "https://cdn-icons-png.flaticon.com/512/271/271220.png",
+      "Voltar 10s",
+      function () {
+        const time = jwplayer("player").getPosition() - 10;
+        jwplayer("player").seek(time > 0 ? time : 0);
+      },
+      "rewind"
+    );
+    jwplayer("player").addButton(
+      "https://cdn-icons-png.flaticon.com/512/709/709586.png",
+      "Baixar",
+      function () {
+        window.open(DOWNLOAD_URL, "_blank");
+      },
+      "download"
+    );
+  }, 500);
+});
+
+jwplayer("player").on('firstFrame', function () {
+
+      if (currentPosition && currentPosition > 0) {
+        const box = `
+          <div class="_4continuar">
+            <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
+            <button class="bt" data-time="${currentPosition}">Sim</button>
+            <button class="bt" data-time="0">Não</button>
+          </div>`;
+        $("#continue-box").html(box);
+      }
+
+      jwplayer("player").on('ready', function () {
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/189/189792.png",
+          "Pular OP/ED",
+          function () {
+            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+          },
+          "skip"
+        );
+
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/271/271228.png",
+          "Avançar 10s",
+          function () {
+            const time = jwplayer("player").getPosition() + 10;
+            jwplayer("player").seek(time);
+          },
+          "forward"
+        );
+
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/271/271220.png",
+          "Voltar 10s",
+          function () {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
+
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/709/709586.png",
+          "Baixar",
+          function () {
+            window.open(DOWNLOAD_URL, "_blank");
+          },
+          "download"
+        );
+            }, 500);
+    });
     });
 
     $(document).on('click', '._4continuar .bt', function () {
