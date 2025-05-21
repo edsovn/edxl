@@ -62,6 +62,10 @@
   if (!VIDEO_URL) {
     document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
   } else {
+    const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
+    const ID = 'video_' + videoName;
+    let currentPosition = parseFloat(localStorage.getItem(ID));
+
     jwplayer("player").setup({
       file: VIDEO_URL,
       width: "100%",
@@ -81,84 +85,80 @@
       }
     });
 
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/189/189792.png",
-      "Pular OP/ED",
-      function () {
-        jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-      },
-      "skip"
-    );
-
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/271/271228.png",
-      "Avançar 10s",
-      function () {
-        const time = jwplayer("player").getPosition() + 10;
-        jwplayer("player").seek(time);
-      },
-      "forward"
-    );
-
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/271/271220.png",
-      "Voltar 10s",
-      function () {
-        const time = jwplayer("player").getPosition() - 10;
-        jwplayer("player").seek(time > 0 ? time : 0);
-      },
-      "rewind"
-    );
-
-    jwplayer("player").addButton(
-      "https://cdn-icons-png.flaticon.com/512/709/709586.png",
-      "Baixar",
-      function () {
-        window.open(DOWNLOAD_URL, "_blank");
-      },
-      "download"
-    );
-
-    (function () {
-      const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
-      const ID = 'video_' + videoName;
-
-      let currentPosition = parseFloat(localStorage.getItem(ID));
-      console.log("Progresso salvo encontrado:", currentPosition);
-
-      jwplayer("player").on('ready', function () {
-        if (currentPosition && currentPosition > 0) {
-          const box = `
-            <div class="_4continuar">
-              <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
-              <button class="bt" data-time="${currentPosition}">Sim</button>
-              <button class="bt" data-time="0">Não</button>
-            </div>`;
-          $("#player").append(box);
-        }
-      });
-
-      $(document).on('click', '._4continuar .bt', function () {
-        const time = parseFloat($(this).data("time"));
-        $("._4continuar").remove();
-        jwplayer("player").seek(time);
-        jwplayer("player").play();
-      });
-
-      jwplayer("player").on('time', function () {
-        const pos = jwplayer("player").getPosition();
-        if (!isNaN(pos)) {
-          localStorage.setItem(ID, pos);
-          console.log("Salvando progresso:", pos);
-        }
-      });
-
-      function millisToMinutesAndSeconds(time) {
-        const min = Math.floor(time / 60);
-        const sec = ("0" + Math.floor(time % 60)).slice(-2);
-        return `${min}:${sec}`;
+    jwplayer("player").on('firstFrame', function () {
+      // Mostrar box de continuar se houver progresso salvo
+      if (currentPosition && currentPosition > 0) {
+        const box = `
+          <div class="_4continuar">
+            <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
+            <button class="bt" data-time="${currentPosition}">Sim</button>
+            <button class="bt" data-time="0">Não</button>
+          </div>`;
+        $("#player").append(box);
       }
-    })();
+
+      // Adicionar botões personalizados
+      jwplayer("player").addButton(
+        "https://cdn-icons-png.flaticon.com/512/189/189792.png",
+        "Pular OP/ED",
+        function () {
+          jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+        },
+        "skip"
+      );
+
+      jwplayer("player").addButton(
+        "https://cdn-icons-png.flaticon.com/512/271/271228.png",
+        "Avançar 10s",
+        function () {
+          const time = jwplayer("player").getPosition() + 10;
+          jwplayer("player").seek(time);
+        },
+        "forward"
+      );
+
+      jwplayer("player").addButton(
+        "https://cdn-icons-png.flaticon.com/512/271/271220.png",
+        "Voltar 10s",
+        function () {
+          const time = jwplayer("player").getPosition() - 10;
+          jwplayer("player").seek(time > 0 ? time : 0);
+        },
+        "rewind"
+      );
+
+      jwplayer("player").addButton(
+        "https://cdn-icons-png.flaticon.com/512/709/709586.png",
+        "Baixar",
+        function () {
+          window.open(DOWNLOAD_URL, "_blank");
+        },
+        "download"
+      );
+    });
+
+    // Ação ao clicar na box de continuar
+    $(document).on('click', '._4continuar .bt', function () {
+      const time = parseFloat($(this).data("time"));
+      $("._4continuar").remove();
+      jwplayer("player").seek(time);
+      jwplayer("player").play();
+    });
+
+    // Salvar progresso continuamente
+    jwplayer("player").on('time', function () {
+      const pos = jwplayer("player").getPosition();
+      if (!isNaN(pos)) {
+        localStorage.setItem(ID, pos);
+        console.log("Salvando progresso:", pos);
+      }
+    });
+
+    function millisToMinutesAndSeconds(time) {
+      const min = Math.floor(time / 60);
+      const sec = ("0" + Math.floor(time % 60)).slice(-2);
+      return `${min}:${sec}`;
+    }
 
     window.addEventListener("message", function (e) {
       if (e.data === 'autoplay') {
