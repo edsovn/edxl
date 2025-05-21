@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>JWPlayer Dinâmico</title>
+  <script type="text/javascript" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+  <script type="text/javascript">
+  jwplayer.key = 'eNFaXCjyURVoCCGiHp7HTQ3hDhE/AfL0g8VE1fRbL84='
+  // jwplayer.key = 'ypdL3Acgwp4Uh2/LDE9dYh3W/EPwDMuA2yid4ytssfI=';
+  // jwplayer.key = 'ITWMv7t88JGzI0xPwW8I0+LveiXX9SWbfdmt0ArUSyc=';
+  // jwplayer.key = '64HPbvSQorQcd52B8XFuhMtEoitbvY/EXJmMBfKcXZQU2Rnn';
+</script>
+</head>
+<body>
+  <div id="my-player">Carregando o player...</div>
+
+  <script>
+    function getVideoUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("video");
+    }
+
+    const videoUrl = getVideoUrl();
+
+    if (videoUrl) {
+      jwplayer("my-player").setup({
+        file: videoUrl,
+        width: "100%",
+        aspectratio: "16:9",
+        controls: true,
+        autostart: false
+      });
+    } else {
+      document.getElementById("my-player").innerText = "Nenhum vídeo especificado.";
+    }
+  </script>
+</body>
+</html>
