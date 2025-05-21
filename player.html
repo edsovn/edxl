@@ -3,115 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <title>JWPlayer Dinâmico</title>
-  <script type="text/javascript" charset="utf-8" async="" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-  <script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/plugins/related/v/6.2.4/related.js"></script>
-  <script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwpsrv.js"></script>
-  <script type="text/javascript" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer" type="text/javascript"></script>
-  <script type="text/javascript">
-  jwplayer.key = 'eNFaXCjyURVoCCGiHp7HTQ3hDhE/AfL0g8VE1fRbL84='
-  // jwplayer.key = 'ypdL3Acgwp4Uh2/LDE9dYh3W/EPwDMuA2yid4ytssfI=';
-  // jwplayer.key = 'ITWMv7t88JGzI0xPwW8I0+LveiXX9SWbfdmt0ArUSyc=';
-  // jwplayer.key = '64HPbvSQorQcd52B8XFuhMtEoitbvY/EXJmMBfKcXZQU2Rnn';
-</script>
-  <style type="text/css">
+  <script src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    jwplayer.key = 'eNFaXCjyURVoCCGiHp7HTQ3hDhE/AfL0g8VE1fRbL84=';
+  </script>
+  <style>
     #player {
       height: 450px;
       width: 800px;
       max-width: 100%;
-      padding: 0;
-      margin: 0;
-    }
-
-    .jw-reset .jw-button-container div.jw-icon-rewind {
-      display: none;
     }
 
     ._4continuar {
+      background: #292929;
       color: #fff;
-      min-height: 6em;
       padding: 18px;
       margin: 10px;
-      width: 100%;
-      text-align: left;
       border-radius: 4px;
-      position: inherit;
-      background: #292929;
     }
 
     ._4continuar bt {
+      display: inline-block;
+      margin: 5px;
       padding: 10px;
       background: #383838;
-      width: calc(100% / 2 - 10px);
-      clear: both;
-      display: inline-table;
-      margin: 5px;
       border-radius: 4px;
-    }
-
-    ._4continuar p {
-      margin: 7px;
+      cursor: pointer;
     }
 
     ._4continuar bt:hover {
-      cursor: pointer;
       background: #504f4f;
     }
-
-    ._4pularab {
-      position: absolute;
-      z-index: 1000;
-      padding: 10px 10px;
-      width: 8em;
-      right: 2em;
-      bottom: 5em;
-      color: #ffffff;
-      border-radius: 4px;
-      text-align: center;
-      background-color: #000000;
-      border: 1px solid rgb(255 255 255 / 72%);
-    }
-
-    ._4pularab:hover {
-      cursor: pointer;
-      background: #ffffff30;
-    }
-
-    #snapshotao {
-      width: 180px;
-      height: 110px;
-      border-radius: 4px;
-      overflow: hidden;
-      position: absolute;
-      bottom: 60px;
-      right: 20px;
-      z-index: 1;
-      display: none;
-    }
-
-    .jw-controlbar {
-      z-index: 2;
-    }
-
-    #snapshotao canvas {
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .close_snapshot {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-      z-index: 1;
-    }
   </style>
-  <script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.core.controls.html5.js"></script>
-  <script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/provider.cast.js"></script>
-  <script src="//www.gstatic.com/cast/sdk/libs/sender/1.0/cast_framework.js"></script>
-  <script src="//www.gstatic.com/eureka/clank/134/cast_sender.js"></script>
 </head>
 <body>
   <div id="player">Carregando o player...</div>
@@ -125,152 +49,110 @@
     const videoUrl = getVideoUrl();
 
     if (videoUrl) {
-      jwplayer("player").setup({
-      sources: [{
-        "file": "videoUrl",
-        "label": "1080p"
-      }],
-      image: "",
-      width: "100%",
-	  aspectratio: "16:9",
-      localization: {
-        fullscreen: "Tela Cheia",
-        hd: "Qualidade",
-        copied: "Copiado",
-        playbackRates: "Velocidade da reprodução",
-        videoInfo: "Sobre este vídeo",
-        rewind: "Voltar 10s",
-        forward: "Avançar 10s",
-        settings: "Configurações",
-        loadingAd: "Carregando anúncio",
-      },
-      controls: true,
-	  loading: "lazy",
-      displaytitle: true,
-      aboutlink: 'https://webmods.com.br/',
-      playbackRateControls: "[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]",
-      plugins: {
-        snapshot: {}
-      },
-      autostart: false,
-      volume: "100",
-      preload: "none",
-      repeat: "false",
-      onmouseenter: "event.target.setAttribute('preload','metadata')",
-      allow: "accelerometer; encrypted-media; gyroscope;",
-      allowfullscreen: "",
-      mozallowfullscreen: "",
-      msallowfullscreen: "",
-      oallowfullscreen: "",
-      webkitallowfullscreen: "",
-      sandbox: "",
-      frameborder: "0",
-      scrolling: "no",
-      cast: {},
-    });
-          // Adiciona um botão de download
-    player.addButton(
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20px" height="21px" viewBox="0 0 20 21" version="1.1"><g id="surface1"><path style="stroke: none; fill-rule: nonzero; fill: rgb(245, 245, 245); fill-opacity: 1; --darkreader-inline-stroke: none; --darkreader-inline-fill: var(--darkreader-text-f5f5f5, #e2dfdb);" d="M 18.625 20.976562 L 1.417969 20.976562 C 0.621094 20.976562 0 20.371094 0 19.59375 L 0 14 C 0 13.222656 0.621094 12.617188 1.417969 12.617188 C 2.210938 12.617188 2.832031 13.222656 2.832031 14 L 2.832031 18.191406 L 17.144531 18.191406 L 17.144531 14 C 17.144531 13.222656 17.769531 12.617188 18.5625 12.617188 C 19.355469 12.617188 19.980469 13.222656 19.980469 14 L 19.980469 19.59375 C 20.042969 20.371094 19.421875 20.976562 18.625 20.976562 Z M 10.902344 12.953125 C 10.40625 13.390625 9.613281 13.390625 9.097656 12.953125 L 4.636719 8.949219 C 4.140625 8.507812 4.140625 7.816406 4.636719 7.355469 C 5.128906 6.894531 5.921875 6.917969 6.4375 7.355469 L 8.5625 9.261719 L 8.5625 1.40625 C 8.5625 0.628906 9.183594 0.0234375 9.980469 0.0234375 C 10.773438 0.0234375 11.394531 0.628906 11.394531 1.40625 L 11.394531 9.242188 L 13.519531 7.335938 C 14.011719 6.894531 14.808594 6.894531 15.320312 7.335938 C 15.816406 7.777344 15.816406 8.46875 15.320312 8.929688 Z M 10.902344 12.953125 " data-darkreader-inline-stroke="" data-darkreader-inline-fill=""></path></g></svg>', // URL do ícone do botão
-      "Baixar", // Texto de tooltip
-      function() {
-        // Função que será chamada ao clicar no botão
-        window.location.href = "https://dl.dropboxusercontent.com/scl/fi/{option}/Midia.mp4?rlkey={text}&dl=1";
-      },
-      "download" // ID único para o botão
-    );
+      const player = jwplayer("player").setup({
+        sources: [{
+          file: videoUrl,
+          label: "1080p"
+        }],
+        width: "100%",
+        aspectratio: "16:9",
+        controls: true,
+        autostart: false,
+        displaytitle: true,
+        playbackRateControls: true,
+        volume: 100,
+        repeat: false,
+        preload: "none",
+        localization: {
+          fullscreen: "Tela Cheia",
+          hd: "Qualidade",
+          copied: "Copiado",
+          playbackRates: "Velocidade da reprodução",
+          videoInfo: "Sobre este vídeo",
+          rewind: "Voltar 10s",
+          forward: "Avançar 10s",
+          settings: "Configurações",
+          loadingAd: "Carregando anúncio"
+        },
+        aboutlink: 'https://webmods.com.br/',
+      });
 
-    player.addButton("https://www.anitube.vip/img/skip.svg?version=0.0.1", "Pular OP/ED", pulaOpening, "pula-opening");
-								function pulaOpening (){
-									player.seek(player.getPosition()+85);
-								}
-    player.addButton('<svg xmlns="http://www.w3.org/2000/svg" class="jw-svg-icon jw-svg-icon-rewind2" viewBox="0 0 240 240" focusable="false"><path d="m 25.993957,57.778 v 125.3 c 0.03604,2.63589 2.164107,4.76396 4.8,4.8 h 62.7 v -19.3 h -48.2 v -96.4 H 160.99396 v 19.3 c 0,5.3 3.6,7.2 8,4.3 l 41.8,-27.9 c 2.93574,-1.480087 4.13843,-5.04363 2.7,-8 -0.57502,-1.174985 -1.52502,-2.124979 -2.7,-2.7 l -41.8,-27.9 c -4.4,-2.9 -8,-1 -8,4.3 v 19.3 H 30.893957 c -2.689569,0.03972 -4.860275,2.210431 -4.9,4.9 z m 163.422413,73.04577 c -3.72072,-6.30626 -10.38421,-10.29683 -17.7,-10.6 -7.31579,0.30317 -13.97928,4.29374 -17.7,10.6 -8.60009,14.23525 -8.60009,32.06475 0,46.3 3.72072,6.30626 10.38421,10.29683 17.7,10.6 7.31579,-0.30317 13.97928,-4.29374 17.7,-10.6 8.60009,-14.23525 8.60009,-32.06475 0,-46.3 z m -17.7,47.2 c -7.8,0 -14.4,-11 -14.4,-24.1 0,-13.1 6.6,-24.1 14.4,-24.1 7.8,0 14.4,11 14.4,24.1 0,13.1 -6.5,24.1 -14.4,24.1 z m -47.77056,9.72863 v -51 l -4.8,4.8 -6.8,-6.8 13,-12.99999 c 3.02543,-3.03598 8.21053,-0.88605 8.2,3.4 v 62.69999 z"></path></svg>', 'Avançar 10s', function() {
-      var seek = 0,
-        time = player.getPosition() + 10;
-      seek = time <= 0 ? 0 : time;
-      player.seek(seek);
-      return true;
-    }, 'forward');
-    player.addButton('<svg xmlns="http://www.w3.org/2000/svg" class="jw-svg-icon jw-svg-icon-rewind" viewBox="0 0 240 240" focusable="false"><path d="M113.2,131.078a21.589,21.589,0,0,0-17.7-10.6,21.589,21.589,0,0,0-17.7,10.6,44.769,44.769,0,0,0,0,46.3,21.589,21.589,0,0,0,17.7,10.6,21.589,21.589,0,0,0,17.7-10.6,44.769,44.769,0,0,0,0-46.3Zm-17.7,47.2c-7.8,0-14.4-11-14.4-24.1s6.6-24.1,14.4-24.1,14.4,11,14.4,24.1S103.4,178.278,95.5,178.278Zm-43.4,9.7v-51l-4.8,4.8-6.8-6.8,13-13a4.8,4.8,0,0,1,8.2,3.4v62.7l-9.6-.1Zm162-130.2v125.3a4.867,4.867,0,0,1-4.8,4.8H146.6v-19.3h48.2v-96.4H79.1v19.3c0,5.3-3.6,7.2-8,4.3l-41.8-27.9a6.013,6.013,0,0,1-2.7-8,5.887,5.887,0,0,1,2.7-2.7l41.8-27.9c4.4-2.9,8-1,8,4.3v19.3H209.2A4.974,4.974,0,0,1,214.1,57.778Z"></path></svg>', 'Voltar 10s', function() {
-      var seek = 0,
-        time = player.getPosition() - 10;
-      seek = time <= 0 ? 0 : time;
-      player.seek(seek);
-      return true;
-    }, 'rewind');
-    window.addEventListener("message", function(e) {
-      if (e.data == 'autoplay') {
-        vp.play();
-        var vid = document.getElementsByTagName("video")[0];
-        if (vid.requestFullscreen) {
-          vid.requestFullscreen();
-        } else if (vid.mozRequestFullScreen) {
-          vid.mozRequestFullScreen();
-        } else if (vid.webkitRequestFullscreen) {
-          vid.webkitRequestFullscreen();
-        }
-      }
-    });
-    window.onorientationchange = function(e) {
-      if (e.landscape) {
-        var vid = document.getElementsByTagName("video")[0];
-        if (vid.requestFullscreen) {
-          vid.requestFullscreen();
-        } else if (vid.mozRequestFullScreen) {
-          vid.mozRequestFullScreen();
-        } else if (vid.webkitRequestFullscreen) {
-          vid.webkitRequestFullscreen();
-        }
-      }
-    };
-    (function() {
-      var playID = 'player';
-      var ID = 'videoUrl';
-      /* progress */
-      var currentPosition = localStorage.getItem("w" + ID);
-      var lock = false;
-      jwplayer().on('play', function() {
-        if (lock == false) {
-          if (currentPosition && currentPosition > 0) {
-            jwplayer().pause();
-            var box = '<div class="_4continuar"><p>Aparentemente você ja esteve assistindo isto, e você parou em ' + millisToMinutesAndSeconds(currentPosition) + '. Deseja continuar de onde parou? </p></div>';
-            $("#" + playID + "").append(box);
-            box = '._4continuar';
-            var bts = '<bt data-time="' + currentPosition + '">Sim</bt><bt data-time="0">Não</bt>';
-            $(box).append(bts);
-            $(document).on('click', '._4continuar > bt', function() {
-              startIn = $(this).attr('data-time');
-              $(box).remove();
-              jwplayer().play();
-              player.seek(startIn);
-            });
-          }
+      // Botão de download
+      player.addButton(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21"><path fill="#f5f5f5" d="M10.902 12.953c-.496.438-1.289.438-1.805 0L4.637 8.949a1 1 0 111.8-1.594l2.125 1.906V1.406a1 1 0 112 0v7.741l2.125-1.906a1 1 0 011.8 1.594zM18.625 20.977H1.418A1.42 1.42 0 010 19.594V14a1.42 1.42 0 012.832 0v4.191h14.313V14a1.42 1.42 0 012.836 0v5.594a1.42 1.42 0 01-1.356 1.383z"/></svg>',
+        "Baixar",
+        function () {
+          window.location.href = videoUrl;
+        },
+        "download"
+      );
+
+      // Botão para pular 85s (pular abertura/ending)
+      player.addButton(
+        "https://www.anitube.vip/img/skip.svg?version=0.0.1",
+        "Pular OP/ED",
+        function () {
+          player.seek(player.getPosition() + 85);
+        },
+        "pula-opening"
+      );
+
+      // Botão avançar 10s
+      player.addButton(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><path d="M113.2,131.078a21.589,21.589,0,0,0-17.7-10.6,21.589,21.589,0,0,0-17.7,10.6a44.769,44.769,0,0,0,0,46.3,21.589,21.589,0,0,0,17.7,10.6,21.589,21.589,0,0,0,17.7-10.6,44.769,44.769,0,0,0,0-46.3Z"/></svg>',
+        "Avançar 10s",
+        function () {
+          player.seek(player.getPosition() + 10);
+        },
+        "forward"
+      );
+
+      // Botão voltar 10s
+      player.addButton(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><path d="M95.5,178.278c-7.8,0-14.4-11-14.4-24.1s6.6-24.1,14.4-24.1,14.4,11,14.4,24.1S103.4,178.278,95.5,178.278Z"/></svg>',
+        "Voltar 10s",
+        function () {
+          const time = Math.max(player.getPosition() - 10, 0);
+          player.seek(time);
+        },
+        "rewind"
+      );
+
+      // Recurso de continuar de onde parou
+      const ID = videoUrl;
+      const playID = 'player';
+      const currentPosition = localStorage.getItem("w" + ID);
+      let lock = false;
+
+      player.on('play', function () {
+        if (!lock && currentPosition > 0) {
+          player.pause();
+          const box = `<div class="_4continuar"><p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p><bt data-time="${currentPosition}">Sim</bt><bt data-time="0">Não</bt></div>`;
+          $("#" + playID).append(box);
         }
         lock = true;
       });
 
-      function millisToMinutesAndSeconds(time) {
-        var ms = time;
-        var min = ms * 1 / 60;
-        var r = min % 1;
-        var sec = Math.floor(r * 60);
-        if (sec < 10) {
-          sec = '0' + sec;
-        }
-        min = Math.floor(min);
-        return min + ':' + sec; /* parseInt() = numeric() */
+      $(document).on("click", "._4continuar > bt", function () {
+        const time = $(this).attr("data-time");
+        $("._4continuar").remove();
+        player.seek(time);
+        player.play();
+      });
+
+      function millisToMinutesAndSeconds(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${min}:${sec}`;
       }
-      jwplayer().on('play', function() {
-        function ping() {
-          if (!localStorage.getItem("w" + ID)) {
-            localStorage.setItem("w" + ID, jwplayer(playID).getPosition());
-          }
-          localStorage["w" + ID] = jwplayer(playID).getPosition();
-          setTimeout(ping, 1000);
+
+      player.on("play", function () {
+        function saveProgress() {
+          localStorage.setItem("w" + ID, player.getPosition());
+          setTimeout(saveProgress, 1000);
         }
-        ping();
-      })
-    })();
-  </script>
+        saveProgress();
+      });
     } else {
       document.getElementById("player").innerText = "Nenhum vídeo especificado.";
     }
