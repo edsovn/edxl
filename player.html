@@ -373,6 +373,16 @@
         min = Math.floor(min);
         return min + ':' + sec; /* parseInt() = numeric() */
       }
+      jwplayer().on('play', function() {
+        function ping() {
+          if (!localStorage.getItem("w" + ID)) {
+            localStorage.setItem("w" + ID, jwplayer(playID).getPosition());
+          }
+          localStorage["w" + ID] = jwplayer(playID).getPosition();
+          setTimeout(ping, 1000);
+        }
+        ping();
+      })
     } else {
       document.getElementById("player").innerText = "Nenhum vídeo especificado.";
     }
