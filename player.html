@@ -11,15 +11,14 @@
     padding: 0;
     height: 100%;
     background: #000;
+    overflow: hidden;
   }
+
   #player {
     width: 100%;
     height: 100%;
     min-height: 360px;
-  }
-
-  .jw-reset .jw-button-container div.jw-icon-rewind {
-    display: none;
+    position: relative;
   }
 
   #continue-box {
@@ -29,7 +28,7 @@
     width: 100%;
     height: 100%;
     z-index: 9999;
-    display: none; /* Oculto por padrão */
+    display: none;
     justify-content: center;
     align-items: center;
   }
@@ -63,7 +62,66 @@
   ._4continuar .bt:hover {
     background: #504f4f;
   }
+
+  #gesture-left, #gesture-right {
+    position: absolute;
+    top: 0;
+    width: 20%;
+    height: 100%;
+    z-index: 9998;
+    touch-action: none;
+    display: none;
+  }
+
+  #gesture-left { left: 0; }
+  #gesture-right { right: 0; }
+
+  #brightness-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: black;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9997;
+  }
+
+  #hud-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 30, 30, 0.85);
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 99999;
+  }
+
+  #hud-feedback img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+  }
 </style>
+</head>
+<body>
+<div id="continue-box"></div>
+<div id="player">Carregando o player...</div>
+<div id="brightness-overlay"></div>
+<div id="gesture-left"></div>
+<div id="gesture-right"></div>
+
+<!-- HUD visual -->
+<div id="hud-feedback">
+  <img id="hud-icon" src="" alt="icone">
+  <div id="hud-text"></div>
+</div>
+
 <script>
   jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
 
@@ -74,19 +132,19 @@
 
   const VIDEO_URL = getQueryParam("video");
   const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
-</script>
-</head>
-<body>
-<div id="continue-box"></div>
-<div id="player">Carregando o player...</div>
-<script>
+
   if (!VIDEO_URL) {
     document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
   } else {
     const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
     const ID = 'video_' + videoName;
     let currentPosition = parseFloat(localStorage.getItem(ID));
-    console.log("Progresso salvo encontrado:", currentPosition);
+    let volume = 100;
+    let brightness = 0;
+
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
 
     jwplayer("player").setup({
       file: VIDEO_URL,
@@ -98,7 +156,7 @@
       displaytitle: true,
       preload: "none",
       repeat: false,
-      volume: 100,
+      volume: volume,
       localization: {
         rewind: "Voltar 10s",
         forward: "Avançar 10s",
@@ -152,50 +210,12 @@
         jwplayer("player").pause();
         const box = `
           <div class="_4continuar">
-            <p>Aparentemente você ja esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
+            <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
         $("#continue-box").html(box).addClass("active");
       }
-
-      jwplayer("player").on('ready', function () {
-        setTimeout(() => {
-          jwplayer("player").addButton(
-            "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
-            "Pular OP/ED",
-            function () {
-              jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-            },
-            "skip"
-          );
-          jwplayer("player").addButton(
-            "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
-            "Avançar 10s",
-            function () {
-              jwplayer("player").seek(jwplayer("player").getPosition() + 10);
-            },
-            "forward"
-          );
-          jwplayer("player").addButton(
-            "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
-            "Voltar 10s",
-            function () {
-              const time = jwplayer("player").getPosition() - 10;
-              jwplayer("player").seek(time > 0 ? time : 0);
-            },
-            "rewind"
-          );
-          jwplayer("player").addButton(
-            "https://www.svgrepo.com/download/499849/download.svg",
-            "Baixar",
-            function () {
-              window.open(DOWNLOAD_URL, "_blank");
-            },
-            "download"
-          );
-        }, 500);
-      });
     });
 
     $(document).on('click', '._4continuar .bt', function () {
@@ -209,7 +229,6 @@
       const pos = jwplayer("player").getPosition();
       if (!isNaN(pos)) {
         localStorage.setItem(ID, pos);
-        console.log("Salvando progresso:", pos);
       }
     });
 
@@ -223,6 +242,64 @@
       if (e.data === 'autoplay') {
         jwplayer("player").play();
       }
+    });
+
+    // --- GESTO COM HUD ---
+    let startY = 0;
+    let isLeft = false;
+    let hudTimeout;
+
+    function showHUD(type, value) {
+      const hud = document.getElementById('hud-feedback');
+      const icon = document.getElementById('hud-icon');
+      const text = document.getElementById('hud-text');
+
+      if (type === 'volume') {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
+        text.textContent = `Volume: ${Math.round(value)}%`;
+      } else if (type === 'brilho') {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
+        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
+      }
+
+      hud.style.display = 'flex';
+      clearTimeout(hudTimeout);
+      hudTimeout = setTimeout(() => {
+        hud.style.display = 'none';
+      }, 1500);
+    }
+
+    function handleStart(e, side) {
+      startY = e.touches[0].clientY;
+      isLeft = (side === 'left');
+    }
+
+    function handleMove(e) {
+      const deltaY = startY - e.touches[0].clientY;
+      const change = deltaY / window.innerHeight * 100;
+
+      if (!isLeft) {
+        volume = clamp(volume + change, 0, 100);
+        jwplayer().setVolume(volume);
+        showHUD('volume', volume);
+      } else {
+        brightness = clamp(brightness - (change / 150), 0, 0.8);
+        document.getElementById('brightness-overlay').style.opacity = brightness;
+        showHUD('brilho', brightness);
+      }
+
+      startY = e.touches[0].clientY;
+    }
+
+    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
+    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
+    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
+    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
+
+    jwplayer("player").on('fullscreen', function (e) {
+      const show = e.fullscreen;
+      document.getElementById('gesture-left').style.display = show ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = show ? 'block' : 'none';
     });
   }
 </script>
