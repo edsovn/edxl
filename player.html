@@ -1,168 +1,237 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player com Gestos</title>
-  <script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: black;
-    }
+<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player</title>
+<script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
 
-    #player-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: black;
-    }
+  #player {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    position: relative;
+  }
 
-    #my-player {
-      width: 100%;
-      height: 100%;
-    }
+  #continue-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
 
-    #gesture-left, #gesture-right {
-      position: absolute;
-      top: 0;
-      width: 20%;
-      height: 100%;
-      touch-action: none;
-      pointer-events: auto;
-      z-index: 9998;
-    }
+  #continue-box.active {
+    display: flex;
+    pointer-events: auto;
+  }
 
-    #gesture-left {
-      left: 0;
-      background: rgba(255, 0, 0, 0.05); /* DEBUG: pode remover depois */
-    }
+  ._4continuar {
+    color: #fff;
+    padding: 20px;
+    max-width: 90%;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(41, 41, 41, 0.95);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
 
-    #gesture-right {
-      right: 0;
-      background: rgba(0, 0, 255, 0.05); /* DEBUG: pode remover depois */
-    }
+  ._4continuar .bt {
+    padding: 10px 20px;
+    background: #383838;
+    display: inline-block;
+    margin: 10px 5px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+  }
 
-    #brightness-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: black;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 9997;
-    }
+  ._4continuar .bt:hover {
+    background: #504f4f;
+  }
 
-    #hud-feedback {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(30, 30, 30, 0.9);
-      padding: 12px 20px;
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      z-index: 99999;
-    }
+  #gesture-left, #gesture-right {
+    position: fixed;
+    top: 0;
+    width: 20%;
+    height: 100%;
+    z-index: 9998;
+    touch-action: none;
+    pointer-events: auto;
+  }
 
-    #hud-feedback img {
-      width: 32px;
-      height: 32px;
-      margin-bottom: 5px;
-    }
-  </style>
+  #gesture-left { left: 0; }
+  #gesture-right { right: 0; }
+
+  #brightness-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: black;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9997;
+  }
+
+  #hud-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 30, 30, 0.85);
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 99999;
+  }
+
+  #hud-feedback img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+  }
+</style>
 </head>
 <body>
 
-<div id="player-container">
-  <div id="my-player">Carregando player...</div>
-
-  <div id="brightness-overlay"></div>
-  <div id="gesture-left"></div>
-  <div id="gesture-right"></div>
-
-  <div id="hud-feedback">
-    <img id="hud-icon" src="" alt="icone">
-    <div id="hud-text"></div>
-  </div>
+<div id="continue-box"></div>
+<div id="player">Carregando o player...</div>
+<div id="brightness-overlay"></div>
+<div id="gesture-left"></div>
+<div id="gesture-right"></div>
+<div id="hud-feedback">
+  <img id="hud-icon" src="" alt="icone">
+  <div id="hud-text"></div>
 </div>
 
 <script>
-  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
+  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA=='
 
-  const videoURL = "https://cdn.jwplayer.com/manifests/yp34SRmf.m3u8"; // vídeo de teste JWPlayer
-  let volume = 100;
-  let brightness = 0;
-  let startY = 0;
-  let isLeft = false;
-  let hudTimeout;
+  const VIDEO_URL = new URLSearchParams(window.location.search).get("video");
+  const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
 
-  function clamp(val, min, max) {
-    return Math.max(min, Math.min(max, val));
-  }
+  if (!VIDEO_URL) {
+    document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
+  } else {
+    const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
+    const ID = 'video_' + videoName;
+    let currentPosition = parseFloat(localStorage.getItem(ID));
+    let volume = 100;
+    let brightness = 0;
+    let startY = 0;
+    let isLeft = false;
+    let hudTimeout;
 
-  function showHUD(type, value) {
-    const hud = document.getElementById('hud-feedback');
-    const icon = document.getElementById('hud-icon');
-    const text = document.getElementById('hud-text');
-
-    if (type === 'volume') {
-      icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
-      text.textContent = `Volume: ${Math.round(value)}%`;
-    } else {
-      icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
-      text.textContent = `Brilho: ${Math.round(value * 100)}%`;
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
     }
 
-    hud.style.display = 'flex';
-    clearTimeout(hudTimeout);
-    hudTimeout = setTimeout(() => {
-      hud.style.display = 'none';
-    }, 1500);
-  }
+    function showHUD(type, value) {
+      const hud = document.getElementById('hud-feedback');
+      const icon = document.getElementById('hud-icon');
+      const text = document.getElementById('hud-text');
 
-  function handleStart(e, side) {
-    startY = e.touches[0].clientY;
-    isLeft = (side === 'left');
-  }
+      if (type === 'volume') {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
+        text.textContent = `Volume: ${Math.round(value)}%`;
+      } else {
+        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
+        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
+      }
 
-  function handleMove(e) {
-    const deltaY = startY - e.touches[0].clientY;
-    const change = deltaY / window.innerHeight * 100;
-
-    if (!isLeft) {
-      volume = clamp(volume + change, 0, 100);
-      jwplayer().setVolume(volume);
-      showHUD('volume', volume);
-    } else {
-      brightness = clamp(brightness - (change / 150), 0, 0.8);
-      document.getElementById('brightness-overlay').style.opacity = brightness;
-      showHUD('brilho', brightness);
+      hud.style.display = 'flex';
+      clearTimeout(hudTimeout);
+      hudTimeout = setTimeout(() => {
+        hud.style.display = 'none';
+      }, 1500);
     }
 
-    startY = e.touches[0].clientY;
+    function handleStart(e, side) {
+      startY = e.touches[0].clientY;
+      isLeft = (side === 'left');
+    }
+
+    function handleMove(e) {
+      const deltaY = startY - e.touches[0].clientY;
+      const change = deltaY / window.innerHeight * 100;
+
+      if (!isLeft) {
+        volume = clamp(volume + change, 0, 100);
+        jwplayer().setVolume(volume);
+        showHUD('volume', volume);
+      } else {
+        brightness = clamp(brightness - (change / 150), 0, 0.8);
+        document.getElementById('brightness-overlay').style.opacity = brightness;
+        showHUD('brilho', brightness);
+      }
+
+      startY = e.touches[0].clientY;
+    }
+
+    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
+    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
+    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
+    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
+
+    jwplayer("player").setup({
+      file: VIDEO_URL,
+      width: "100%",
+      height: "100%",
+      controls: true,
+      autostart: false,
+      playbackRateControls: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],
+      displaytitle: true,
+      preload: "none",
+      repeat: false,
+      volume: volume
+    });
+
+    jwplayer("player").on('ready', function () {
+      jwplayer("player").setPlaybackRate(1);
+    });
+
+    jwplayer("player").on('firstFrame', function () {
+      if (currentPosition && currentPosition > 0) {
+        jwplayer("player").pause();
+        const box = `
+          <div class="_4continuar">
+            <p>Você parou em ${Math.floor(currentPosition / 60)}:${("0"+Math.floor(currentPosition % 60)).slice(-2)}. Continuar?</p>
+            <button class="bt" data-time="${currentPosition}">Sim</button>
+            <button class="bt" data-time="0">Não</button>
+          </div>`;
+        $("#continue-box").html(box).addClass("active");
+      }
+    });
+
+    $(document).on('click', '._4continuar .bt', function () {
+      const time = parseFloat($(this).data("time"));
+      $("#continue-box").removeClass("active").empty();
+      jwplayer("player").seek(time);
+      jwplayer("player").play();
+    });
+
+    jwplayer("player").on('time', function () {
+      const pos = jwplayer("player").getPosition();
+      if (!isNaN(pos)) localStorage.setItem(ID, pos);
+    });
   }
-
-  document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
-  document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
-  document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
-  document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
-
-  // JWPlayer setup
-  jwplayer("my-player").setup({
-    file: videoURL,
-    width: "100%",
-    height: "100%",
-    autostart: true,
-    controls: true
-  });
 </script>
-
 </body>
 </html>
