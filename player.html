@@ -22,12 +22,16 @@
       display: none;
     }
 
+  #continue-box {
+    position: relative;
+    z-index: 1000;
+  }
   ._4continuar {
     color: #fff;
     min-height: 6em;
     padding: 18px;
     margin: 10px;
-    width: 100%;
+    width: calc(100% - 20px);
     text-align: left;
     border-radius: 4px;
     background: #292929;
@@ -57,6 +61,7 @@
 </script>
 </head>
 <body>
+<div id="continue-box"></div>
 <div id="player">Carregando o player...</div>
 <script>
   if (!VIDEO_URL) {
@@ -65,6 +70,7 @@
     const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
     const ID = 'video_' + videoName;
     let currentPosition = parseFloat(localStorage.getItem(ID));
+    console.log("Progresso salvo encontrado:", currentPosition);
 
     jwplayer("player").setup({
       file: VIDEO_URL,
@@ -86,7 +92,6 @@
     });
 
     jwplayer("player").on('firstFrame', function () {
-      // Mostrar box de continuar se houver progresso salvo
       if (currentPosition && currentPosition > 0) {
         const box = `
           <div class="_4continuar">
@@ -94,50 +99,50 @@
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
-        $("#player").append(box);
+        $("#continue-box").html(box);
       }
 
-      // Adicionar botões personalizados
-      jwplayer("player").addButton(
-        "https://cdn-icons-png.flaticon.com/512/189/189792.png",
-        "Pular OP/ED",
-        function () {
-          jwplayer("player").seek(jwplayer("player").getPosition() + 82);
-        },
-        "skip"
-      );
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/189/189792.png",
+          "Pular OP/ED",
+          function () {
+            jwplayer("player").seek(jwplayer("player").getPosition() + 82);
+          },
+          "skip"
+        );
 
-      jwplayer("player").addButton(
-        "https://cdn-icons-png.flaticon.com/512/271/271228.png",
-        "Avançar 10s",
-        function () {
-          const time = jwplayer("player").getPosition() + 10;
-          jwplayer("player").seek(time);
-        },
-        "forward"
-      );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/271/271228.png",
+          "Avançar 10s",
+          function () {
+            const time = jwplayer("player").getPosition() + 10;
+            jwplayer("player").seek(time);
+          },
+          "forward"
+        );
 
-      jwplayer("player").addButton(
-        "https://cdn-icons-png.flaticon.com/512/271/271220.png",
-        "Voltar 10s",
-        function () {
-          const time = jwplayer("player").getPosition() - 10;
-          jwplayer("player").seek(time > 0 ? time : 0);
-        },
-        "rewind"
-      );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/271/271220.png",
+          "Voltar 10s",
+          function () {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
 
-      jwplayer("player").addButton(
-        "https://cdn-icons-png.flaticon.com/512/709/709586.png",
-        "Baixar",
-        function () {
-          window.open(DOWNLOAD_URL, "_blank");
-        },
-        "download"
-      );
+        jwplayer("player").addButton(
+          "https://cdn-icons-png.flaticon.com/512/709/709586.png",
+          "Baixar",
+          function () {
+            window.open(DOWNLOAD_URL, "_blank");
+          },
+          "download"
+        );
+      }, 500);
     });
 
-    // Ação ao clicar na box de continuar
     $(document).on('click', '._4continuar .bt', function () {
       const time = parseFloat($(this).data("time"));
       $("._4continuar").remove();
@@ -145,7 +150,6 @@
       jwplayer("player").play();
     });
 
-    // Salvar progresso continuamente
     jwplayer("player").on('time', function () {
       const pos = jwplayer("player").getPosition();
       if (!isNaN(pos)) {
