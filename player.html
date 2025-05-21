@@ -64,20 +64,20 @@
   }
 
   #gesture-left, #gesture-right {
-    position: fixed;
+    position: absolute;
     top: 0;
     width: 20%;
     height: 100%;
     z-index: 9998;
     touch-action: none;
-    pointer-events: auto;
+    display: none;
   }
 
   #gesture-left { left: 0; }
   #gesture-right { right: 0; }
 
   #brightness-overlay {
-    position: fixed;
+    position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
     background-color: black;
@@ -87,7 +87,7 @@
   }
 
   #hud-feedback {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -116,15 +116,22 @@
 <div id="brightness-overlay"></div>
 <div id="gesture-left"></div>
 <div id="gesture-right"></div>
+
+<!-- HUD visual -->
 <div id="hud-feedback">
   <img id="hud-icon" src="" alt="icone">
   <div id="hud-text"></div>
 </div>
 
 <script>
-  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA=='
+  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
 
-  const VIDEO_URL = new URLSearchParams(window.location.search).get("video");
+  function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  }
+
+  const VIDEO_URL = getQueryParam("video");
   const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
 
   if (!VIDEO_URL) {
@@ -135,6 +142,7 @@
     let currentPosition = parseFloat(localStorage.getItem(ID));
     let volume = 100;
     let brightness = 0;
+    let isFullscreen = false;
     let startY = 0;
     let isLeft = false;
     let hudTimeout;
@@ -143,7 +151,15 @@
       return Math.max(min, Math.min(max, val));
     }
 
+    function millisToMinutesAndSeconds(time) {
+      const min = Math.floor(time / 60);
+      const sec = ("0" + Math.floor(time % 60)).slice(-2);
+      return `${min}:${sec}`;
+    }
+
     function showHUD(type, value) {
+      if (!isFullscreen) return;
+
       const hud = document.getElementById('hud-feedback');
       const icon = document.getElementById('hud-icon');
       const text = document.getElementById('hud-text');
@@ -151,7 +167,7 @@
       if (type === 'volume') {
         icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
         text.textContent = `Volume: ${Math.round(value)}%`;
-      } else {
+      } else if (type === 'brilho') {
         icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
         text.textContent = `Brilho: ${Math.round(value * 100)}%`;
       }
@@ -164,11 +180,13 @@
     }
 
     function handleStart(e, side) {
+      if (!isFullscreen) return;
       startY = e.touches[0].clientY;
       isLeft = (side === 'left');
     }
 
     function handleMove(e) {
+      if (!isFullscreen) return;
       const deltaY = startY - e.touches[0].clientY;
       const change = deltaY / window.innerHeight * 100;
 
@@ -185,11 +203,6 @@
       startY = e.touches[0].clientY;
     }
 
-    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
-    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
-    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
-    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
-
     jwplayer("player").setup({
       file: VIDEO_URL,
       width: "100%",
@@ -200,11 +213,47 @@
       displaytitle: true,
       preload: "none",
       repeat: false,
-      volume: volume
+      volume: volume,
+      localization: {
+        rewind: "Voltar 10s",
+        forward: "Avançar 10s",
+        fullscreen: "Tela Cheia",
+        hd: "Qualidade"
+      }
     });
 
     jwplayer("player").on('ready', function () {
       jwplayer("player").setPlaybackRate(1);
+
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://www.svgrepo.com/download/15996/fast-forward-button.svg",
+          "Pular OP/ED",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
+          "skip"
+        );
+        jwplayer("player").addButton(
+          "https://www.svgrepo.com/download/447764/rewind-10-seconds.svg",
+          "Avançar 10s",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 10),
+          "forward"
+        );
+        jwplayer("player").addButton(
+          "https://www.svgrepo.com/download/495319/forward-10-seconds.svg",
+          "Voltar 10s",
+          () => {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
+        jwplayer("player").addButton(
+          "https://www.svgrepo.com/download/499849/download.svg",
+          "Baixar",
+          () => window.open(DOWNLOAD_URL, "_blank"),
+          "download"
+        );
+      }, 500);
     });
 
     jwplayer("player").on('firstFrame', function () {
@@ -212,7 +261,7 @@
         jwplayer("player").pause();
         const box = `
           <div class="_4continuar">
-            <p>Você parou em ${Math.floor(currentPosition / 60)}:${("0"+Math.floor(currentPosition % 60)).slice(-2)}. Continuar?</p>
+            <p>Aparentemente você ja esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
@@ -229,7 +278,29 @@
 
     jwplayer("player").on('time', function () {
       const pos = jwplayer("player").getPosition();
-      if (!isNaN(pos)) localStorage.setItem(ID, pos);
+      if (!isNaN(pos)) {
+        localStorage.setItem(ID, pos);
+      }
+    });
+
+    window.addEventListener("message", function (e) {
+      if (e.data === 'autoplay') {
+        jwplayer("player").play();
+      }
+    });
+
+    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
+    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
+    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
+    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
+
+    jwplayer("player").on('fullscreen', function (e) {
+      isFullscreen = e.fullscreen;
+      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
+      if (!isFullscreen) {
+        document.getElementById('hud-feedback').style.display = 'none';
+      }
     });
   }
 </script>
