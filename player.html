@@ -17,6 +17,11 @@
     height: 100%;
     min-height: 360px;
   }
+
+    .jw-reset .jw-button-container div.jw-icon-rewind {
+      display: none;
+    }
+  
   ._4continuar {
     color: #fff;
     min-height: 6em;
@@ -107,7 +112,7 @@
 
     jwplayer("player").addButton(
       "https://cdn-icons-png.flaticon.com/512/709/709586.png",
-      "Baixar vídeo",
+      "Baixar",
       function () {
         window.open(DOWNLOAD_URL, "_blank");
       },
