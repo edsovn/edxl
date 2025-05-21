@@ -22,10 +22,16 @@
       display: none;
     }
 
-  #continue-box {
-    position: relative;
-    z-index: 1000;
-  }
+  
+#continue-box {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
   ._4continuar {
     color: #fff;
     min-height: 6em;
@@ -102,6 +108,7 @@
         $("#continue-box").html(box);
       }
 
+      jwplayer("player").on('ready', function () {
       setTimeout(() => {
         jwplayer("player").addButton(
           "https://cdn-icons-png.flaticon.com/512/189/189792.png",
@@ -140,7 +147,8 @@
           },
           "download"
         );
-      }, 500);
+            }, 500);
+    });
     });
 
     $(document).on('click', '._4continuar .bt', function () {
