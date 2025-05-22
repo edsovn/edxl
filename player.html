@@ -12,18 +12,7 @@
     height: 100%;
     background: #000;
     overflow: hidden;
-  
-    function checkFullscreen() {
-      isFullscreen = !!document.fullscreenElement;
-      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
-      if (!isFullscreen) {
-        document.getElementById('hud-feedback').style.display = 'none';
-      }
-    }
-    document.addEventListener('fullscreenchange', checkFullscreen);
-
-}
+  }
 
   #player {
     width: 100%;
@@ -260,7 +249,20 @@
       }
     });
 
-    jwplayer("player").on('ready', function () {
+    
+    function checkFullscreenBySize() {
+      isFullscreen = (window.innerHeight >= screen.height - 1);
+      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
+      if (!isFullscreen) {
+        document.getElementById('hud-feedback').style.display = 'none';
+      }
+      console.log("Fullscreen?", isFullscreen);
+    }
+    window.addEventListener('resize', checkFullscreenBySize);
+    document.addEventListener('DOMContentLoaded', checkFullscreenBySize);
+
+jwplayer("player").on('ready', function () {
       jwplayer("player").setPlaybackRate(1);
 
       setTimeout(() => {
