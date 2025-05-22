@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player</title>
-  <script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player</title>
+<script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
 
-    #player {
-      width: 100%;
-      height: 100%;
-      min-height: 360px;
-      position: relative;
-    }
+  #player {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    position: relative;
+  }
 
     .jw-reset .jw-button-container div.jw-icon-rewind {
       display: none;
     }
-
+  
     .icon-btn svg {
       width: 48px;
       height: 48px;
@@ -36,54 +36,59 @@
       fill: #aaa;
     }
 
-    #continue-box {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
+  #continue-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
 
-    #continue-box.active {
-      display: flex;
-      pointer-events: auto;
-    }
+  #continue-box.active {
+    display: flex;
+    pointer-events: auto;
+  }
 
-    ._4continuar {
-      color: #fff;
-      padding: 20px;
-      max-width: 90%;
-      text-align: center;
-      border-radius: 8px;
-      background: rgba(41, 41, 41, 0.95);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      font-weight: bold;
-    }
+  ._4continuar {
+    color: #fff;
+    padding: 20px;
+    max-width: 90%;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(41, 41, 41, 0.95);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+  }
 
-    ._4continuar .bt {
-      padding: 10px 20px;
-      background: #383838;
-      display: inline-block;
-      margin: 10px 5px 0;
-      border-radius: 4px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-    }
+  ._4continuar .bt {
+    padding: 10px 20px;
+    background: #383838;
+    display: inline-block;
+    margin: 10px 5px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+  }
 
-    ._4continuar .bt:hover {
-      background: #504f4f;
-    }
-  </style>
+  ._4continuar .bt:hover {
+    background: #504f4f;
+  }</style>
 </head>
 <body>
 
 <div id="continue-box"></div>
 <div id="player">Carregando o player...</div>
+<div id="fastForward" class="icon-btn"></div>
+<div id="rewind10" class="icon-btn"></div>
+<div id="forward10" class="icon-btn"></div>
+<div id="download" class="icon-btn"></div>
+
+</div>
 
 <script>
   jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
@@ -103,6 +108,7 @@
     const ID = 'video_' + videoName;
     let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
     let volume = 100;
+    }
 
     jwplayer("player").setup({
       file: VIDEO_URL,
@@ -123,22 +129,46 @@
       }
     });
 
-    function millisToMinutesAndSeconds(millis) {
-      let minutes = Math.floor(millis / 60);
-      let seconds = Math.floor(millis % 60);
-      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    }
-
     jwplayer("player").on('ready', function () {
       jwplayer("player").setPlaybackRate(1);
+
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://www.anitube.vip/img/skip.svg?version=0.0.1",
+          "Pular OP/ED",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
+          "skip"
+        );
+        jwplayer("player").addButton(
+          "<svg xmlns='http://www.w3.org/2000/svg' class='jw-svg-icon jw-svg-icon-rewind2' viewBox='0 0 240 240' focusable='false'><path d='m 25.993957,57.778 v 125.3 c 0.03604,2.63589 2.164107,4.76396 4.8,4.8 h 62.7 v -19.3 h -48.2 v -96.4 H 160.99396 v 19.3 c 0,5.3 3.6,7.2 8,4.3 l 41.8,-27.9 c 2.93574,-1.480087 4.13843,-5.04363 2.7,-8 -0.57502,-1.174985 -1.52502,-2.124979 -2.7,-2.7 l -41.8,-27.9 c -4.4,-2.9 -8,-1 -8,4.3 v 19.3 H 30.893957 c -2.689569,0.03972 -4.860275,2.210431 -4.9,4.9 z m 163.422413,73.04577 c -3.72072,-6.30626 -10.38421,-10.29683 -17.7,-10.6 -7.31579,0.30317 -13.97928,4.29374 -17.7,10.6 -8.60009,14.23525 -8.60009,32.06475 0,46.3 3.72072,6.30626 10.38421,10.29683 17.7,10.6 7.31579,-0.30317 13.97928,-4.29374 17.7,-10.6 8.60009,-14.23525 8.60009,-32.06475 0,-46.3 z m -17.7,47.2 c -7.8,0 -14.4,-11 -14.4,-24.1 0,-13.1 6.6,-24.1 14.4,-24.1 7.8,0 14.4,11 14.4,24.1 0,13.1 -6.5,24.1 -14.4,24.1 z m -47.77056,9.72863 v -51 l -4.8,4.8 -6.8,-6.8 13,-12.99999 c 3.02543,-3.03598 8.21053,-0.88605 8.2,3.4 v 62.69999 z'></path></svg>",
+          "Avançar 10s",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 10),
+          "forward"
+        );
+        jwplayer("player").addButton(
+          "<svg xmlns='http://www.w3.org/2000/svg' class='jw-svg-icon jw-svg-icon-rewind' viewBox='0 0 240 240' focusable='false'><path d='M113.2,131.078a21.589,21.589,0,0,0-17.7-10.6,21.589,21.589,0,0,0-17.7,10.6,44.769,44.769,0,0,0,0,46.3,21.589,21.589,0,0,0,17.7,10.6,21.589,21.589,0,0,0,17.7-10.6,44.769,44.769,0,0,0,0-46.3Zm-17.7,47.2c-7.8,0-14.4-11-14.4-24.1s6.6-24.1,14.4-24.1,14.4,11,14.4,24.1S103.4,178.278,95.5,178.278Zm-43.4,9.7v-51l-4.8,4.8-6.8-6.8,13-13a4.8,4.8,0,0,1,8.2,3.4v62.7l-9.6-.1Zm162-130.2v125.3a4.867,4.867,0,0,1-4.8,4.8H146.6v-19.3h48.2v-96.4H79.1v19.3c0,5.3-3.6,7.2-8,4.3l-41.8-27.9a6.013,6.013,0,0,1-2.7-8,5.887,5.887,0,0,1,2.7-2.7l41.8-27.9c4.4-2.9,8-1,8,4.3v19.3H209.2A4.974,4.974,0,0,1,214.1,57.778Z'></path></svg>",
+          "Voltar 10s",
+          () => {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
+        jwplayer("player").addButton(
+          "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='20px' height='21px' viewBox='0 0 20 21' version='1.1'><g id='surface1'><path style='stroke: none; fill-rule: nonzero; fill: rgb(245, 245, 245); fill-opacity: 1; --darkreader-inline-stroke: none; --darkreader-inline-fill: var(--darkreader-text-f5f5f5, #e2dfdb);' d='M 18.625 20.976562 L 1.417969 20.976562 C 0.621094 20.976562 0 20.371094 0 19.59375 L 0 14 C 0 13.222656 0.621094 12.617188 1.417969 12.617188 C 2.210938 12.617188 2.832031 13.222656 2.832031 14 L 2.832031 18.191406 L 17.144531 18.191406 L 17.144531 14 C 17.144531 13.222656 17.769531 12.617188 18.5625 12.617188 C 19.355469 12.617188 19.980469 13.222656 19.980469 14 L 19.980469 19.59375 C 20.042969 20.371094 19.421875 20.976562 18.625 20.976562 Z M 10.902344 12.953125 C 10.40625 13.390625 9.613281 13.390625 9.097656 12.953125 L 4.636719 8.949219 C 4.140625 8.507812 4.140625 7.816406 4.636719 7.355469 C 5.128906 6.894531 5.921875 6.917969 6.4375 7.355469 L 8.5625 9.261719 L 8.5625 1.40625 C 8.5625 0.628906 9.183594 0.0234375 9.980469 0.0234375 C 10.773438 0.0234375 11.394531 0.628906 11.394531 1.40625 L 11.394531 9.242188 L 13.519531 7.335938 C 14.011719 6.894531 14.808594 6.894531 15.320312 7.335938 C 15.816406 7.777344 15.816406 8.46875 15.320312 8.929688 Z M 10.902344 12.953125 ' data-darkreader-inline-stroke='' data-darkreader-inline-fill=''></path></g></svg>",
+          "Baixar",
+          () => window.open(DOWNLOAD_URL, "_blank"),
+          "download"
+        );
+      }, 500);
     });
 
     jwplayer("player").on('firstFrame', function () {
-      if (currentPosition > 0) {
+      if (currentPosition && currentPosition > 0) {
         jwplayer("player").pause();
         const box = `
           <div class="_4continuar">
-            <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
+            <p>Aparentemente você ja esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
             <button class="bt" data-time="${currentPosition}">Sim</button>
             <button class="bt" data-time="0">Não</button>
           </div>`;
@@ -160,13 +190,11 @@
       }
     });
 
-    // Suporte a autoplay via postMessage
     window.addEventListener("message", function (e) {
       if (e.data === 'autoplay') {
         jwplayer("player").play();
       }
-    });
-  }
+    });}
 </script>
 </body>
 </html>
