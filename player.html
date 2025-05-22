@@ -103,7 +103,27 @@
   if (!VIDEO_URL) {
     document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
   } else {
-  const ID = 'video_' + encodeURIComponent(VIDEO_URL);
+  function extractUniqueId(url) {
+  try {
+    const path = new URL(url).pathname;
+    const parts = path.split('/');
+    const sclIndex = parts.indexOf('scl');
+    const sIndex = parts.indexOf('s');
+    
+    if (sclIndex !== -1 && parts[sclIndex + 2]) {
+      return parts[sclIndex + 2]; // scl/fi/UNIQUE_ID
+    } else if (sIndex !== -1 && parts[sIndex + 1]) {
+      return parts[sIndex + 1]; // s/UNIQUE_ID
+    }
+    return url; // fallback
+  } catch (e) {
+    return url;
+  }
+}
+
+const VIDEO_URL = getQueryParam("video");
+const UNIQUE_ID = extractUniqueId(VIDEO_URL);
+const ID = 'video_' + UNIQUE_ID;
   let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
   let volume = 100;
 
