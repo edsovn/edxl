@@ -163,6 +163,24 @@
     let volume = 100;
     let brightness = 0;
     let isFullscreen = false;
+
+    function shouldEnableGestures() {
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      const bigScreen = window.innerHeight >= screen.height * 0.9;
+      return isMobile && bigScreen;
+    }
+
+    function updateGestureVisibility() {
+      const enable = shouldEnableGestures();
+      document.getElementById('gesture-left').style.display = enable ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = enable ? 'block' : 'none';
+      console.log("Gestos ativados?", enable);
+    }
+
+    window.addEventListener('resize', updateGestureVisibility);
+    document.addEventListener('DOMContentLoaded', updateGestureVisibility);
+    setInterval(updateGestureVisibility, 1000);
+
     let startY = 0;
     let isLeft = false;
     let hudTimeout;
@@ -204,8 +222,8 @@
       return /Mobi|Android/i.test(navigator.userAgent);
     }
     function handleStart(e, side) {
-      if (!isFullscreen || !isMobile()) return;
-      console.log("Start gesture on", side);
+      if (!isMobile()) return;
+      console.log("GESTO iniciado no lado", side);
 
       if (!isFullscreen) return;
       startY = e.touches[0].clientY;
@@ -249,20 +267,7 @@
       }
     });
 
-    
-    function checkFullscreenBySize() {
-      isFullscreen = (window.innerHeight >= screen.height - 1);
-      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
-      if (!isFullscreen) {
-        document.getElementById('hud-feedback').style.display = 'none';
-      }
-      console.log("Fullscreen?", isFullscreen);
-    }
-    window.addEventListener('resize', checkFullscreenBySize);
-    document.addEventListener('DOMContentLoaded', checkFullscreenBySize);
-
-jwplayer("player").on('ready', function () {
+    jwplayer("player").on('ready', function () {
       jwplayer("player").setPlaybackRate(1);
 
       setTimeout(() => {
