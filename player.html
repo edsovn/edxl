@@ -103,10 +103,9 @@
   if (!VIDEO_URL) {
     document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
   } else {
-    const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
-    const ID = 'video_' + videoName;
-    let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
-    let volume = 100;
+  const ID = 'video_' + encodeURIComponent(VIDEO_URL);
+  let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
+  let volume = 100;
 
 function millisToMinutesAndSeconds(seconds) {
   const min = Math.floor(seconds / 60);
