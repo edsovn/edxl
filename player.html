@@ -61,7 +61,6 @@
     border-radius: 8px;
     background: rgba(41, 41, 41, 0.95);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    font-weight: bold;
   }
 
   ._4continuar .bt {
@@ -106,7 +105,7 @@
   } else {
     const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
     const ID = 'video_' + videoName;
-    let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
+    let currentPosition = parseFloat(localStorage.getItem(ID));
     let volume = 100;
     }
 
