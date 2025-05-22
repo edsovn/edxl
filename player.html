@@ -20,6 +20,17 @@
     min-height: 360px;
     position: relative;
   }
+  
+    .icon-btn svg {
+      width: 48px;
+      height: 48px;
+      fill: #fff;
+      cursor: pointer;
+      transition: fill 0.3s ease;
+    }
+    .icon-btn svg:hover {
+      fill: #aaa;
+    }
 
   #continue-box {
     position: absolute;
@@ -113,6 +124,10 @@
 
 <div id="continue-box"></div>
 <div id="player">Carregando o player...</div>
+<div id="fastForward" class="icon-btn"></div>
+<div id="rewind10" class="icon-btn"></div>
+<div id="forward10" class="icon-btn"></div>
+<div id="download" class="icon-btn"></div>
 <div id="brightness-overlay"></div>
 <div id="gesture-left"></div>
 <div id="gesture-right"></div>
@@ -227,7 +242,7 @@
 
       setTimeout(() => {
         jwplayer("player").addButton(
-          "https://iconoir.com/icons/fast-forward.svg",
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4v16l7-8zm9 0v16l7-8z"/></svg>,
           "Pular OP/ED",
           () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
           "skip"
