@@ -12,7 +12,18 @@
     height: 100%;
     background: #000;
     overflow: hidden;
-  }
+  
+    function checkFullscreen() {
+      isFullscreen = !!document.fullscreenElement;
+      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
+      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
+      if (!isFullscreen) {
+        document.getElementById('hud-feedback').style.display = 'none';
+      }
+    }
+    document.addEventListener('fullscreenchange', checkFullscreen);
+
+}
 
   #player {
     width: 100%;
@@ -79,6 +90,7 @@
   }
 
   #gesture-left, #gesture-right {
+    pointer-events: auto;
     position: absolute;
     top: 0;
     width: 20%;
@@ -198,7 +210,14 @@
       }, 1500);
     }
 
+    
+    function isMobile() {
+      return /Mobi|Android/i.test(navigator.userAgent);
+    }
     function handleStart(e, side) {
+      if (!isFullscreen || !isMobile()) return;
+      console.log("Start gesture on", side);
+
       if (!isFullscreen) return;
       startY = e.touches[0].clientY;
       isLeft = (side === 'left');
@@ -313,14 +332,7 @@
     document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
     document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
 
-    jwplayer("player").on('fullscreen', function (e) {
-      isFullscreen = e.fullscreen;
-      document.getElementById('gesture-left').style.display = isFullscreen ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = isFullscreen ? 'block' : 'none';
-      if (!isFullscreen) {
-        document.getElementById('hud-feedback').style.display = 'none';
-      }
-    });
+    
   }
 </script>
 </body>
