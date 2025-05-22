@@ -76,54 +76,7 @@
 
   ._4continuar .bt:hover {
     background: #504f4f;
-  }
-
-  #gesture-left, #gesture-right {
-    pointer-events: auto;
-    position: absolute;
-    top: 0;
-    width: 20%;
-    height: 100%;
-    z-index: 9998;
-    touch-action: none;
-    display: none;
-  }
-
-  #gesture-left { left: 0; }
-  #gesture-right { right: 0; }
-
-  #brightness-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: black;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 9997;
-  }
-
-  #hud-feedback {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(30, 30, 30, 0.85);
-    padding: 12px 20px;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    z-index: 99999;
-  }
-
-  #hud-feedback img {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 5px;
-  }
-</style>
+  }</style>
 </head>
 <body>
 
@@ -133,14 +86,7 @@
 <div id="rewind10" class="icon-btn"></div>
 <div id="forward10" class="icon-btn"></div>
 <div id="download" class="icon-btn"></div>
-<div id="brightness-overlay"></div>
-<div id="gesture-left"></div>
-<div id="gesture-right"></div>
 
-<!-- HUD visual -->
-<div id="hud-feedback">
-  <img id="hud-icon" src="" alt="icone">
-  <div id="hud-text"></div>
 </div>
 
 <script>
@@ -159,87 +105,7 @@
   } else {
     const videoName = new URL(VIDEO_URL).pathname.split('/').pop();
     const ID = 'video_' + videoName;
-    let currentPosition = parseFloat(localStorage.getItem(ID));
-    let volume = 100;
-    let brightness = 0;
-    let isFullscreen = false;
-
-    function shouldEnableGestures() {
-      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-      const bigScreen = window.innerHeight >= screen.height * 0.9;
-      return isMobile && bigScreen;
-    }
-
-    function updateGestureVisibility() {
-      const enable = shouldEnableGestures();
-      document.getElementById('gesture-left').style.display = enable ? 'block' : 'none';
-      document.getElementById('gesture-right').style.display = enable ? 'block' : 'none';
-      console.log("Gestos ativados?", enable);
-    }
-
-    window.addEventListener('resize', updateGestureVisibility);
-    document.addEventListener('DOMContentLoaded', updateGestureVisibility);
-    setInterval(updateGestureVisibility, 1000);
-
-    let startY = 0;
-    let isLeft = false;
-    let hudTimeout;
-
-    function clamp(val, min, max) {
-      return Math.max(min, Math.min(max, val));
-    }
-
-    function millisToMinutesAndSeconds(time) {
-      const min = Math.floor(time / 60);
-      const sec = ("0" + Math.floor(time % 60)).slice(-2);
-      return `${min}:${sec}`;
-    }
-
-    function showHUD(type, value) {
-      if (!isFullscreen) return;
-
-      const hud = document.getElementById('hud-feedback');
-      const icon = document.getElementById('hud-icon');
-      const text = document.getElementById('hud-text');
-
-      if (type === 'volume') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png";
-        text.textContent = `Volume: ${Math.round(value)}%`;
-      } else if (type === 'brilho') {
-        icon.src = "https://cdn-icons-png.flaticon.com/512/3103/3103446.png";
-        text.textContent = `Brilho: ${Math.round(value * 100)}%`;
-      }
-
-      hud.style.display = 'flex';
-      clearTimeout(hudTimeout);
-      hudTimeout = setTimeout(() => {
-        hud.style.display = 'none';
-      }, 1500);
-    }
-
-    
-    function isMobile() {
-      return /Mobi|Android/i.test(navigator.userAgent);
-    }
-    function handleStart(e, side) {
-      if (!isMobile()) return;
-      console.log("GESTO iniciado no lado", side);
-
-      if (!isFullscreen) return;
-      startY = e.touches[0].clientY;
-      isLeft = (side === 'left');
-    }
-
-    function handleMove(e) {
-      if (!isFullscreen) return;
-      const deltaY = startY - e.touches[0].clientY;
-      const change = deltaY / window.innerHeight * 100;
-
-      if (!isLeft) {
-        volume = clamp(volume + change, 0, 100);
-        jwplayer().setVolume(volume);
-        showHUD('volume', volume);
-      } else {
+    let currentPosition = parseFloat(localStorage.getItem(ID));let volume = 100;else {
         brightness = clamp(brightness - (change / 150), 0, 0.8);
         document.getElementById('brightness-overlay').style.opacity = brightness;
         showHUD('brilho', brightness);
@@ -332,15 +198,7 @@
       if (e.data === 'autoplay') {
         jwplayer("player").play();
       }
-    });
-
-    document.getElementById('gesture-left').addEventListener('touchstart', e => handleStart(e, 'left'));
-    document.getElementById('gesture-left').addEventListener('touchmove', handleMove);
-    document.getElementById('gesture-right').addEventListener('touchstart', e => handleStart(e, 'right'));
-    document.getElementById('gesture-right').addEventListener('touchmove', handleMove);
-
-    
-  }
+    });}
 </script>
 </body>
 </html>
