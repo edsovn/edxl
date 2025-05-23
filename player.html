@@ -94,7 +94,7 @@
   }
 
   const VIDEO_URL = getQueryParam("video");
-  const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
+  const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("&raw=1", "?dl=1") : "";
 
   if (!VIDEO_URL) {
     document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
