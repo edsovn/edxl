@@ -138,7 +138,6 @@ if (videoUrl) {
   return; // interrompe a espera pelo clique
 }
   document.querySelectorAll('[data-player-id][data-file]').forEach(function (el) {
-    el.addEventListener('click', function () {
       const playerId = el.dataset.playerId;
       const file = el.dataset.file;
 
@@ -311,7 +310,7 @@ if (videoUrl) {
     const sec = Math.floor(time % 60).toString().padStart(2, "0");
     return `${min}:${sec}`;
   }
-});
+);
 </script>
 </body>
 </html>
