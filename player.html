@@ -124,6 +124,19 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+	const params = new URLSearchParams(location.search);
+const videoUrl = params.get('video');
+if (videoUrl) {
+  const playerEl = document.getElementById('player');
+  // remova os outros elementos (se houver botões "lazy")
+  jwplayer('player').setup({
+    file: videoUrl,
+    width: '100%',
+    height: '100%'
+    // outras opções...
+  });
+  return; // interrompe a espera pelo clique
+}
   document.querySelectorAll('.lazy-video').forEach(function (el) {
     el.addEventListener('click', function () {
       const playerId = el.dataset.playerId;
