@@ -137,7 +137,7 @@ if (videoUrl) {
   });
   return; // interrompe a espera pelo clique
 }
-  document.querySelectorAll('.lazy-video').forEach(function (el) {
+  document.querySelectorAll('.lazy-video, [data-player-id][data-file]').forEach(function (el) {
     el.addEventListener('click', function () {
       const playerId = el.dataset.playerId;
       const file = el.dataset.file;
