@@ -1,25 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html>More actions
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Player</title>
-<script type="text/javascript" charset="utf-8" async="" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/plugins/related/v/6.2.4/related.js"></script>
-<script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwpsrv.js"></script>
-<script type="text/javascript" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer" type="text/javascript"></script>
-<script type="text/javascript">
-    jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA=='
-    // jwplayer.key = 'eNFaXCjyURVoCCGiHp7HTQ3hDhE/AfL0g8VE1fRbL84=';
-    // jwplayer.key = 'ypdL3Acgwp4Uh2/LDE9dYh3W/EPwDMuA2yid4ytssfI=';
-    // jwplayer.key = 'ITWMv7t88JGzI0xPwW8I0+LveiXX9SWbfdmt0ArUSyc=';
-    // jwplayer.key = '64HPbvSQorQcd52B8XFuhMtEoitbvY/EXJmMBfKcXZQU2Rnn';
-</script>
-<script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.core.controls.html5.js"></script>
-<script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/provider.cast.js"></script>
-<script src="//www.gstatic.com/cast/sdk/libs/sender/1.0/cast_framework.js"></script>
-<script src="//www.gstatic.com/eureka/clank/134/cast_sender.js"></script>
+<script src="https://ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <style>
   html, body {
     margin: 0;
@@ -88,159 +74,145 @@
 <div id="continue-box"></div>
 <div id="player">Carregando o player...</div>
 
-<div id="player" style="width:100%;height:100%;"></div>
-
 <script>
-function getVideoURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("video");
-}
+  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
 
-function millisToMinutesAndSeconds(time) {
-  const min = Math.floor(time / 60);
-  const sec = Math.floor(time % 60).toString().padStart(2, "0");
-  return `${min}:${sec}`;
-}
+  function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const playerId = "player";
-  const file = getVideoURL();
-  if (!file) return;
+  const VIDEO_URL = getQueryParam("video");
+  const DOWNLOAD_URL = VIDEO_URL ? VIDEO_URL.replace("raw=1", "dl=1") : "";
 
-  const uniqueID = "w" + playerId;
-  const storageKey = "jw_" + uniqueID;
-  const currentPosition = parseFloat(localStorage.getItem(storageKey));
-  let lock = false;
+  if (!VIDEO_URL) {
+    document.getElementById("player").innerHTML = '<p style="color:white;padding:20px">URL do vídeo não fornecida.</p>';
+  } else {
+    function extractUniqueId(url) {
+      try {
+        const path = new URL(url).pathname;
+        const parts = path.split('/');
+        const sclIndex = parts.indexOf('scl');
+        const sIndex = parts.indexOf('s');
 
-  jwplayer(playerId).setup({
-    file: file,
-    width: '100%',
-    height: '100%',
-    localization: {
-      fullscreen: "Tela Cheia",
-      hd: "Qualidade",
-      copied: "Copiado",
-      playbackRates: "Velocidade da reprodução",
-      videoInfo: "Sobre este vídeo",
-      rewind: "Voltar 10s",
-      forward: "Avançar 10s",
-      settings: "Configurações",
-      loadingAd: "Carregando anúncio",
-    },
-    controls: true,
-    displaytitle: true,
-    aboutlink: 'https://webmods.com.br/',
-    playbackRateControls: "[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]",
-    plugins: {
-      snapshot: {}
-    },
-    volume: "100",
-    preload: "none",
-    repeat: "false",
-    autostart: true
-  });
-
-  // 🔁 Retomada
-  jwplayer(playerId).on('play', function () {
-    if (!lock && currentPosition && currentPosition > 0) {
-      jwplayer(playerId).pause();
-      const boxId = "_4continuar_" + playerId;
-      const boxHtml = `
-        <div class="_4continuar" id="${boxId}">
-          <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
-          <bt data-time="${currentPosition}">Sim</bt><bt data-time="0">Não</bt>
-        </div>`;
-      document.getElementById(playerId).insertAdjacentHTML("beforeend", boxHtml);
-
-      document.querySelectorAll(`#${boxId} > bt`).forEach(function (bt) {
-        bt.addEventListener("click", function () {
-          const startIn = parseFloat(this.getAttribute("data-time"));
-          document.getElementById(boxId).remove();
-          jwplayer(playerId).seek(startIn);
-          jwplayer(playerId).play();
-        });
-      });
-    }
-    lock = true;
-
-    (function ping() {
-      localStorage.setItem(storageKey, jwplayer(playerId).getPosition());
-      setTimeout(ping, 1000);
-    })();
-  });
-
-  // Move botões para a esquerda
-  jwplayer(playerId).on("beforePlay", function () {
-    function tryMoveButtons(attempts = 10) {
-      const player = jwplayer(playerId);
-      const container = player.getContainer().querySelector(".jw-button-container");
-      const rewind = player.getContainer().querySelector("[button='rewind']");
-      const forward = player.getContainer().querySelector("[button='forward']");
-      const skip = player.getContainer().querySelector("[button='pula-opening']");
-
-      if (container && rewind && forward && skip && container.children.length) {
-        const buttons = container.children;
-        const playButton = buttons[0];
-        if (playButton) {
-          container.insertBefore(rewind, playButton.nextSibling);
-          container.insertBefore(forward, rewind.nextSibling);
-          container.insertBefore(skip, forward.nextSibling);
+        if (sclIndex !== -1 && parts[sclIndex + 2]) {
+          return parts[sclIndex + 2];
+        } else if (sIndex !== -1 && parts[sIndex + 1]) {
+          return parts[sIndex + 1];
         }
-      } else if (attempts > 0) {
-        setTimeout(() => tryMoveButtons(attempts - 1), 100);
+        return url;
+      } catch (e) {
+        return url;
       }
     }
 
-    tryMoveButtons();
-  });
+    const UNIQUE_ID = extractUniqueId(VIDEO_URL);
+    const ID = 'video_' + UNIQUE_ID;
+    let currentPosition = parseFloat(localStorage.getItem(ID)) || 0;
+    let volume = 100;
 
-  // Botão de download
-  jwplayer(playerId).addButton(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21"><path fill="#f5f5f5" d="M18.625 20.977H1.418A1.42 1.42 0 0 1 0 19.594V14a1.42 1.42 0 0 1 1.418-1.383c.793 0 1.414.605 1.414 1.383v4.191h14.313V14a1.42 1.42 0 0 1 1.418-1.383c.793 0 1.418.605 1.418 1.383v5.594c.063.778-.559 1.383-1.457 1.383zM10.902 12.953a.996.996 0 0 1-1.805 0l-4.46-4.004a1 1 0 1 1 1.361-1.473l2.125 1.906V1.406A1.383 1.383 0 0 1 9.98 0a1.383 1.383 0 0 1 1.414 1.406v7.836l2.125-1.906a1 1 0 1 1 1.36 1.473z"/></svg>',
-    "Baixar",
-    function () {
-      let downloadUrl = file;
-      if (/\.mp4$/i.test(downloadUrl)) {
-        downloadUrl += "?dl=1";
+    function millisToMinutesAndSeconds(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    jwplayer("player").setup({
+      file: VIDEO_URL,
+      width: "100%",
+      height: "100%",
+      controls: true,
+      autostart: false,
+      playbackRateControls: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],
+      displaytitle: true,
+      preload: "none",
+      repeat: false,
+      volume: 100,
+      localization: {
+        rewind: "Voltar 10s",
+        forward: "Avançar 10s",
+        fullscreen: "Tela Cheia",
+        hd: "Qualidade"
       }
-      downloadUrl = downloadUrl.replace(/&raw=1$/, '&dl=1');
-      window.location.href = downloadUrl;
-    },
-    "download"
-  );
+    });
 
-  // Botão pular OP
-  jwplayer(playerId).addButton("https://www.anitube.vip/img/skip.svg?version=0.0.1", "Pular OP/ED", function () {
-    jwplayer(playerId).seek(jwplayer(playerId).getPosition() + 83);
-  }, "pula-opening");
+    jwplayer("player").on('ready', function () {
+      jwplayer("player").setPlaybackRate(1);
 
-  // Botões de avançar/retroceder
-  jwplayer(playerId).addButton('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><path d="..."/></svg>', 'Avançar 10s', function() {
-    const time = jwplayer(playerId).getPosition() + 10;
-    jwplayer(playerId).seek(time <= 0 ? 0 : time);
-  }, 'forward');
+      setTimeout(() => {
+        jwplayer("player").addButton(
+          "https://www.anitube.vip/img/skip.svg?version=0.0.1",
+          "Pular OP/ED",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 82),
+          "skip"
+        );
 
-  jwplayer(playerId).addButton('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><path d="..."/></svg>', 'Voltar 10s', function() {
-    const time = jwplayer(playerId).getPosition() - 10;
-    jwplayer(playerId).seek(time <= 0 ? 0 : time);
-  }, 'rewind');
+        jwplayer("player").addButton(
+          `<svg xmlns='http://www.w3.org/2000/svg' class='jw-svg-icon jw-svg-icon-forward' viewBox='0 0 240 240' width='24' height='24'><path fill='#fff' d='m 25.993957,57.778 v 125.3 c 0.03604,2.63589 2.164107,4.76396 4.8,4.8 h 62.7 v -19.3 h -48.2 v -96.4 H 160.99396 v 19.3 c 0,5.3 3.6,7.2 8,4.3 l 41.8,-27.9 c 2.93574,-1.480087 4.13843,-5.04363 2.7,-8 -0.57502,-1.174985 -1.52502,-2.124979 -2.7,-2.7 l -41.8,-27.9 c -4.4,-2.9 -8,-1 -8,4.3 v 19.3 H 30.893957 c -2.689569,0.03972 -4.860275,2.210431 -4.9,4.9 z m 163.422413,73.04577 c -3.72072,-6.30626 -10.38421,-10.29683 -17.7,-10.6 -7.31579,0.30317 -13.97928,4.29374 -17.7,10.6 -8.60009,14.23525 -8.60009,32.06475 0,46.3 3.72072,6.30626 10.38421,10.29683 17.7,10.6 7.31579,-0.30317 13.97928,-4.29374 17.7,-10.6 8.60009,-14.23525 8.60009,-32.06475 0,-46.3 z m -17.7,47.2 c -7.8,0 -14.4,-11 -14.4,-24.1 0,-13.1 6.6,-24.1 14.4,-24.1 7.8,0 14.4,11 14.4,24.1 0,13.1 -6.5,24.1 -14.4,24.1 z m -47.77056,9.72863 v -51 l -4.8,4.8 -6.8,-6.8 13,-12.99999 c 3.02543,-3.03598 8.21053,-0.88605 8.2,3.4 v 62.69999 z'></path></svg>`,
+          "Avançar 10s",
+          () => jwplayer("player").seek(jwplayer("player").getPosition() + 10),
+          "forward"
+        );
 
-  // Autoplay em fullscreen e orientação
-  window.addEventListener("message", function (e) {
-    if (e.data == 'autoplay') {
-      const vid = document.getElementsByTagName("video")[0];
-      if (vid.requestFullscreen) vid.requestFullscreen();
-      jwplayer(playerId).play();
-    }
-  });
+        jwplayer("player").addButton(
+          `<svg xmlns='http://www.w3.org/2000/svg' class='jw-svg-icon jw-svg-icon-rewind' viewBox='0 0 240 240' width='24' height='24'><path fill='#fff' d='M113.2,131.078a21.589,21.589,0,0,0-17.7-10.6,21.589,21.589,0,0,0-17.7,10.6,44.769,44.769,0,0,0,0,46.3,21.589,21.589,0,0,0,17.7,10.6,21.589,21.589,0,0,0,17.7-10.6,44.769,44.769,0,0,0,0-46.3Zm-17.7,47.2c-7.8,0-14.4-11-14.4-24.1s6.6-24.1,14.4-24.1,14.4,11,14.4,24.1S103.4,178.278,95.5,178.278Zm-43.4,9.7v-51l-4.8,4.8-6.8-6.8,13-13a4.8,4.8,0,0,1,8.2,3.4v62.7l-9.6-.1Zm162-130.2v125.3a4.867,4.867,0,0,1-4.8,4.8H146.6v-19.3h48.2v-96.4H79.1v19.3c0,5.3-3.6,7.2-8,4.3l-41.8-27.9a6.013,6.013,0,0,1-2.7-8,5.887,5.887,0,0,1,2.7-2.7l41.8-27.9c4.4-2.9,8-1,8,4.3v19.3H209.2A4.974,4.974,0,0,1,214.1,57.778Z'></path></svg>`,
+          "Voltar 10s",
+          () => {
+            const time = jwplayer("player").getPosition() - 10;
+            jwplayer("player").seek(time > 0 ? time : 0);
+          },
+          "rewind"
+        );
 
-  window.onorientationchange = function () {
-    if (screen.orientation.type.startsWith('landscape')) {
-      const vid = document.getElementsByTagName("video")[0];
-      if (vid.requestFullscreen) vid.requestFullscreen();
-    }
-  };
-});
+        jwplayer("player").addButton(
+          `<svg xmlns='http://www.w3.org/2000/svg' width='24px' height='24px' viewBox='0 0 20 21'><path fill='#fff' d='M10.9 12.95c-.5.44-1.3.44-1.8 0L4.64 8.95a1 1 0 1 1 1.4-1.6L8.56 9.26V1.41a1 1 0 0 1 2 0v7.83l2.13-1.9a1 1 0 1 1 1.32 1.5zM18.63 21H1.42A1.43 1.43 0 0 1 0 19.59V14a1.43 1.43 0 0 1 2.83 0v4.19h14.31V14a1.43 1.43 0 0 1 2.85 0v5.59c.06.78-.56 1.41-1.36 1.41z'/></svg>`,
+          "Baixar",
+          () => {
+            const link = document.createElement("a");
+            link.href = DOWNLOAD_URL;
+            link.download = "";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          },
+          "download"
+        );
+      }, 500);
+    });
+
+    jwplayer("player").on('firstFrame', function () {
+      if (currentPosition && currentPosition > 0) {
+        jwplayer("player").pause();
+        const box = `
+          <div class="_4continuar">
+            <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
+            <button class="bt" data-time="${currentPosition}">Sim</button>
+            <button class="bt" data-time="0">Não</button>
+          </div>`;
+        $("#continue-box").html(box).addClass("active");
+      }
+    });
+
+    $(document).on('click', '._4continuar .bt', function () {
+      const time = parseFloat($(this).data("time"));
+      $("#continue-box").removeClass("active").empty();
+      jwplayer("player").seek(time);
+      jwplayer("player").play();
+    });
+
+    jwplayer("player").on('time', function () {
+      const pos = jwplayer("player").getPosition();
+      if (!isNaN(pos)) {
+        localStorage.setItem(ID, pos);
+      }
+    });
+
+    window.addEventListener("message", function (e) {
+      if (e.data === 'autoplay') {
+        jwplayer("player").play();
+      }
+    });
+  }
 </script>
 </body>
 </html>
