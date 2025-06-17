@@ -1,44 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Player JWPlayer</title>
-  <script src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script>jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';</script>
-  <style>
-    #player {
-      width: 100%;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
-    ._4continuar {
-      color: #fff;
-      min-height: 6em;
-      padding: 18px;
-      margin: 10px;
-      width: 100%;
-      text-align: left;
-      border-radius: 4px;
-      background: #292929;
-    }
-    ._4continuar bt {
-      padding: 10px;
-      background: #383838;
-      width: calc(50% - 10px);
-      margin: 5px;
-      display: inline-block;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    ._4continuar bt:hover { background: #504f4f; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Player JWPlayer</title>
+<script type="text/javascript" charset="utf-8" async="" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+<script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/plugins/related/v/6.2.4/related.js"></script>
+<script type="text/javascript" charset="utf-8" async="" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwpsrv.js"></script>
+<script type="text/javascript" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" type="text/javascript"></script>
+<script type="text/javascript">
+  jwplayer.key = 'XsK+VuloUK5YB+O7Z6I3aD4DP42TKEoQd2MLvA==';
+</script>
+<script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/jwplayer.core.controls.html5.js"></script>
+<script charset="utf-8" src="//ssl.p.jwpcdn.com/player/v/8.36.4/provider.cast.js"></script>
+<script src="//www.gstatic.com/cast/sdk/libs/sender/1.0/cast_framework.js"></script>
+<script src="//www.gstatic.com/eureka/clank/134/cast_sender.js"></script>
+<style>
+  #player {
+    width: 800px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .jw-reset .jw-button-container div.jw-icon-rewind {
+    display: none;
+  }
+
+  ._4continuar {
+    color: #fff;
+    min-height: 6em;
+    padding: 18px;
+    margin: 10px;
+    width: 100%;
+    text-align: left;
+    border-radius: 4px;
+    position: inherit;
+    background: #292929;
+  }
+
+  ._4continuar bt {
+    padding: 10px;
+    background: #383838;
+    width: calc(100% / 2 - 10px);
+    clear: both;
+    display: inline-table;
+    margin: 5px;
+    border-radius: 4px;
+  }
+
+  ._4continuar p {
+    margin: 7px;
+  }
+
+  ._4continuar bt:hover {
+    cursor: pointer;
+    background: #504f4f;
+  }
+
+  ._4pularab {
+    position: absolute;
+    z-index: 1000;
+    padding: 10px 10px;
+    width: 8em;
+    right: 2em;
+    bottom: 5em;
+    color: #ffffff;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #000000;
+    border: 1px solid rgb(255 255 255 / 72%);
+  }
+
+  ._4pularab:hover {
+    cursor: pointer;
+    background: #ffffff30;
+  }
+
+  #snapshotao {
+    width: 180px;
+    height: 110px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: absolute;
+    bottom: 60px;
+    right: 20px;
+    z-index: 1;
+    display: none;
+  }
+
+  .jw-controlbar {
+    z-index: 2;
+  }
+
+  #snapshotao canvas {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .close_snapshot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  #player {
+    width: 100%;
+    height: 100vh;
+  }
+</style>
 </head>
 <body>
 
-<!-- Player sempre visível -->
+<!-- Contêiner onde o player será criado -->
 <div id="player"></div>
 
 <script>
@@ -47,27 +128,28 @@
     return urlParams.get(param);
   }
 
+  function millisToMinutesAndSeconds(time) {
+    const min = Math.floor(time / 60);
+    const sec = Math.floor(time % 60).toString().padStart(2, "0");
+    return `${min}:${sec}`;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     const videoUrl = getQueryParam('video');
-    if (!videoUrl) {
-      document.body.innerHTML = "<p style='color:white;background:#000;padding:1em;'>Nenhum vídeo especificado na URL</p>";
-      return;
-    }
+    if (!videoUrl) return;
 
     const playerId = "player";
+    const file = videoUrl;
+    const container = document.getElementById(playerId);
     const uniqueID = "w" + playerId;
     const storageKey = "jw_" + uniqueID;
     const currentPosition = parseFloat(localStorage.getItem(storageKey));
     let lock = false;
 
     jwplayer(playerId).setup({
-      file: videoUrl,
-      width: "100%",
-      height: "100%",
-      controls: true,
-      autostart: true,
-      displaytitle: true,
-      aboutlink: 'https://webmods.com.br/',
+      file: file,
+      width: '100%',
+      height: '100%',
       localization: {
         fullscreen: "Tela Cheia",
         hd: "Qualidade",
@@ -79,8 +161,18 @@
         settings: "Configurações",
         loadingAd: "Carregando anúncio",
       },
+      controls: true,
+      loading: "lazy",
+      displaytitle: true,
+      aboutlink: 'https://webmods.com.br/',
       playbackRateControls: "[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]",
-      plugins: { snapshot: {} }
+      plugins: {
+        snapshot: {}
+      },
+      volume: "100",
+      preload: "none",
+      repeat: "false",
+      autostart: true
     });
 
     jwplayer(playerId).on('play', function () {
@@ -89,11 +181,11 @@
         const boxId = "_4continuar_" + playerId;
         const boxHtml = `
           <div class="_4continuar" id="${boxId}">
-            <p>Você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar?</p>
-            <bt data-time="${currentPosition}">Sim</bt>
-            <bt data-time="0">Não</bt>
+            <p>Aparentemente você já esteve assistindo isto, e você parou em ${millisToMinutesAndSeconds(currentPosition)}. Deseja continuar de onde parou?</p>
+            <bt data-time="${currentPosition}">Sim</bt><bt data-time="0">Não</bt>
           </div>`;
         document.getElementById(playerId).insertAdjacentHTML("beforeend", boxHtml);
+
         document.querySelectorAll(`#${boxId} > bt`).forEach(function (bt) {
           bt.addEventListener("click", function () {
             const startIn = parseFloat(this.getAttribute("data-time"));
@@ -104,6 +196,7 @@
         });
       }
       lock = true;
+
       (function ping() {
         localStorage.setItem(storageKey, jwplayer(playerId).getPosition());
         setTimeout(ping, 1000);
@@ -121,6 +214,7 @@
         if (container && rewind && forward && skip && container.children.length) {
           const buttons = container.children;
           const playButton = buttons[0];
+
           if (playButton) {
             container.insertBefore(rewind, playButton.nextSibling);
             container.insertBefore(forward, rewind.nextSibling);
@@ -130,35 +224,34 @@
           setTimeout(() => tryMoveButtons(attempts - 1), 100);
         }
       }
+
       tryMoveButtons();
     });
 
-    jwplayer(playerId).addButton("https://www.anitube.vip/img/skip.svg?version=0.0.1", "Pular OP/ED", function () {
-      jwplayer(playerId).seek(jwplayer(playerId).getPosition() + 83);
-    }, "pula-opening");
+    jwplayer(playerId).addButton(
+      "https://www.anitube.vip/img/skip.svg?version=0.0.1", "Pular OP/ED",
+      function () { jwplayer(playerId).seek(jwplayer(playerId).getPosition() + 83); },
+      "pula-opening"
+    );
 
     jwplayer(playerId).addButton("⏩", "Avançar 10s", function () {
-      jwplayer(playerId).seek(jwplayer(playerId).getPosition() + 10);
+      var seek = jwplayer(playerId).getPosition() + 10;
+      jwplayer(playerId).seek(seek);
     }, "forward");
 
     jwplayer(playerId).addButton("⏪", "Voltar 10s", function () {
-      const pos = jwplayer(playerId).getPosition();
-      jwplayer(playerId).seek(pos >= 10 ? pos - 10 : 0);
+      var seek = jwplayer(playerId).getPosition() - 10;
+      jwplayer(playerId).seek(seek <= 0 ? 0 : seek);
     }, "rewind");
 
     jwplayer(playerId).addButton("⬇️", "Baixar", function () {
-      let downloadUrl = videoUrl;
+      let downloadUrl = file;
       if (/\.mp4$/i.test(downloadUrl)) downloadUrl += "?dl=1";
-      downloadUrl = downloadUrl.replace(/&raw=1$/, "&dl=1");
+      downloadUrl = downloadUrl.replace(/&raw=1$/, '&dl=1');
       window.location.href = downloadUrl;
     }, "download");
-
-    function millisToMinutesAndSeconds(time) {
-      const min = Math.floor(time / 60);
-      const sec = Math.floor(time % 60).toString().padStart(2, "0");
-      return `${min}:${sec}`;
-    }
   });
 </script>
+
 </body>
 </html>
