@@ -22,10 +22,8 @@
 <script src="//www.gstatic.com/eureka/clank/134/cast_sender.js"></script>
 <style>
     #player {
-      width: 800px;
-      height: auto;
-      aspect-ratio: 16 / 9;
-      max-width: 100%;
+      width: 100%;
+      height: 100vh;
       padding: 0;
       margin: 0;
     }
@@ -114,23 +112,24 @@
       cursor: pointer;
       z-index: 1;
     }
-  #player { width: 100%; height: 100vh; }
 </style>
 </head>
 <body>
-<div id="player" style="display:none;"></div>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-      const videoUrl = getQueryParam('video');
-      const playerId = 'player';
 
-      if (videoUrl) {
-      const uniqueID = "w" + playerId;
-      const storageKey = "jw_" + uniqueID;
-      const currentPosition = parseFloat(localStorage.getItem(storageKey)) || 0;
-      let lock = false;
-        
-    jwplayer(playerId).setup({
+<!-- Contêiner onde o player será criado -->
+<div id="player"></div>
+
+<script>
+  // Função para pegar parâmetro da URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  const videoUrl = getQueryParam('video');
+
+  if (videoUrl) {
+    jwplayer("player").setup({
         file: file,
         width: '100%',
         height: '100%',
