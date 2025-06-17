@@ -131,9 +131,9 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     const videoUrl = getQueryParam('video');
+    const playerId = 'player';
 
     if (videoUrl) {
-      const playerId = "player";
       const uniqueID = "w" + playerId;
       const storageKey = "jw_" + uniqueID;
       const currentPosition = parseFloat(localStorage.getItem(storageKey));
