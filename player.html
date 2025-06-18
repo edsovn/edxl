@@ -181,6 +181,10 @@
       jwplayer(playerId).setPlaybackRate(1);
     });
 
+    player.on('ready', function() {
+      player.setPlaybackRate(1);
+    });
+
     jwplayer(playerId).on('play', function () {
       if (!lock && currentPosition && currentPosition > 0) {
         jwplayer(playerId).pause();
