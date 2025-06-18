@@ -21,9 +21,10 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
-    max-width: 100%;
+    max-height: calc(100vh - 50px); /* evita ultrapassar a tela */
     padding: 0;
     margin: 0;
+    display: block;
   }
 
   .jw-reset .jw-button-container div.jw-icon-rewind {
