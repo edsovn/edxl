@@ -150,7 +150,7 @@
     const file = videoUrl;
     const container = document.getElementById(playerId);
     const uniqueID = "w" + playerId;
-    const storageKey = "jw_" + uniqueID;
+    const storageKey = "jw_" + btoa(file);
     const currentPosition = parseFloat(localStorage.getItem(storageKey));
     let lock = false;
 
