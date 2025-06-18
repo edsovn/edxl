@@ -18,9 +18,13 @@
 <script src="//www.gstatic.com/eureka/clank/134/cast_sender.js"></script>
 <style>
   #player {
+    width: 100%;
+    height: auto;
     aspect-ratio: 16 / 9;
-  all: unset;
-}
+    padding: 0;
+    margin: 0;
+    display: block;
+  }
 
   .jw-reset .jw-button-container div.jw-icon-rewind {
     display: none;
@@ -139,6 +143,8 @@
 
     jwplayer(playerId).setup({
       file: file,
+      width: '100%',
+      height: '100%',
       localization: {
         fullscreen: "Tela Cheia",
         hd: "Qualidade",
