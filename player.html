@@ -177,6 +177,9 @@
       autostart: false
     });
 
+    jwplayer(playerId).on('play', function() {
+      jwplayer(playerId).setPlaybackRate(1);
+    });
     jwplayer(playerId).on('ready', function() {
       jwplayer(playerId).setPlaybackRate(1);
     });
