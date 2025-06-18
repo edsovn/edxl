@@ -177,9 +177,9 @@
       autostart: false
     });
 
-jwplayer(playerId).on('firstFrame', function() {
-  jwplayer(playerId).setPlaybackRate(1); // Aplica só na primeira vez que o vídeo roda
-});
+    jwplayer(playerId).on('firstFrame', function() {
+      jwplayer(playerId).setPlaybackRate(1);
+    });
 
     jwplayer(playerId).on('play', function () {
       if (!lock && currentPosition && currentPosition > 0) {
